@@ -5,10 +5,10 @@ import {
   WMSTileLayer,
   LayersControl,
 } from "react-leaflet";
-import axios from "axios";
+import api from "../../lib/axios";
 import "leaflet/dist/leaflet.css";
 
-const RadarAnimation = () => {
+const AnimationProduct = () => {
   // 1. States quản lý dữ liệu và animation
   const [timestamps, setTimestamps] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -20,9 +20,9 @@ const RadarAnimation = () => {
   // 2. Hàm Fetch dữ liệu từ API
   const fetchTimestamps = async () => {
     try {
-      const response = await axios.get("/api/time");
-      // API trả về mới nhất đứng đầu -> Đảo ngược lại để chạy animation từ cũ đến mới
-      const data = response.data.reverse();
+      const response = await api.get("/time");
+      // API trả về data time nhất đứng đầu
+      const data = response.data;
 
       setTimestamps((prev) => {
         // Nếu có dữ liệu mới, cập nhật và giữ nguyên vị trí index nếu đang xem
@@ -47,10 +47,10 @@ const RadarAnimation = () => {
     const checkTimeInterval = setInterval(() => {
       const now = new Date();
       const minutes = now.getMinutes(); // Lấy phút hiện tại (0-59)
-
+      console.log("check time ...")
       // 3. Logic: Kiểm tra nếu số phút kết thúc bằng 3 (03, 13, 23, 33, 43, 53)
-      // Cách viết gọn: minutes % 10 === 4
-      if (minutes % 10 === 4) {
+      // Cách viết gọn: minutes % 10 === 3
+      if (minutes % 10 === 3) {
         console.log(
           `Đã đến thời điểm vàng (${minutes}ph), đang cập nhật dữ liệu radar mới...`,
         );
@@ -63,39 +63,41 @@ const RadarAnimation = () => {
   }, []);
 
   // 4. Logic chạy Animation
-  useEffect(() => {
-    if (isPlaying && timestamps.length > 0) {
-      animationRef.current = setInterval(() => {
-        setCurrentIndex((prevIndex) =>
-          prevIndex >= timestamps.length - 1 ? 0 : prevIndex + 1,
-        );
-      }, 1000);
-    } else {
-      clearInterval(animationRef.current);
-    }
-    return () => clearInterval(animationRef.current);
-  }, [isPlaying, timestamps]);
+  // useEffect(() => {
+  //   if (isPlaying && timestamps.length > 0) {
+  //     animationRef.current = setInterval(() => {
+  //       setCurrentIndex((prevIndex) =>
+  //         prevIndex >= timestamps.length - 1 ? 0 : prevIndex + 1,
+  //       );
+  //     }, 1000);
+  //   } else {
+  //     clearInterval(animationRef.current);
+  //   }
+  //   return () => clearInterval(animationRef.current);
+  // }, [isPlaying, timestamps]);
 
   return (
     <>
       {timestamps.length > 0 && (
         <WMSTileLayer
           key={timestamps[currentIndex]} // Key thay đổi buộc Leaflet render lại Layer mà không bị lưu cache cũ
-          url="http://your-geoserver-url/geoserver/wms"
+          url="https://radarphadin.com.vn/geoserver/radar/gwc/service/wms"
           params={{
-            layers: "radar:hmax_mosaic",
+            layers: "radar:max_mosaic_index",
             format: "image/png",
             transparent: true,
             version: "1.1.1",
             // Tham số quan trọng nhất: Gửi mốc thời gian tương ứng với currentIndex
             time: timestamps[currentIndex],
+            pane: "paneRadar",
+            crs: L.CRS.EPSG3857,
           }}
-          zIndex={100}
+        
         />
       )}
 
       {/* Bảng điều khiển Animation (UI Overlay) */}
-      <div className="absolute flex flex-col items-center p-4 transform -translate-x-1/2 bg-white rounded-lg shadow-lg bottom-10 left-1/2 z-1000 min-w-100">
+      {/* <div className="absolute flex flex-col items-center p-4 transform -translate-x-1/2 bg-white rounded-lg shadow-lg bottom-10 left-1/2 z-1000 min-w-100">
         <div className="mb-2 font-bold text-blue-700">
           🕒 Thời gian:{" "}
           {timestamps[currentIndex]
@@ -124,9 +126,9 @@ const RadarAnimation = () => {
             {currentIndex + 1} / {timestamps.length}
           </span>
         </div>
-      </div>
+      </div> */}
     </>
   );
 };
 
-export default RadarAnimation;
+export default AnimationProduct;

@@ -15,6 +15,7 @@ import {
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useState, useRef, useEffect, useMemo } from "react";
+import AnimationProduct from "./ui/AnimationProduct";
 
 const boundsNorthVN = L.latLngBounds([17.7, 101.5], [25.2, 108.0]);
 
@@ -41,7 +42,7 @@ const MainContent = () => {
 
         setProvincesData(provData);
         setDistrictsData(distData);
-        console.log(distData);
+        
       } catch (error) {
         console.error("Lỗi tải dữ liệu không gian:", error);
       }
@@ -152,6 +153,8 @@ const MainContent = () => {
 
         {/* Chèn các layer tĩnh đã được đóng băng */}
         {staticMapLayers}
+
+        <AnimationProduct></AnimationProduct>
       </MapContainer>
     </main>
   );

@@ -306,3 +306,17 @@ const OptimizedRadarMap = () => {
 };
 
 export default OptimizedRadarMap;
+
+
+<WMSTileLayer
+          url="https://radarphadin.com.vn/geoserver/radar/wms" // Dùng endpoint WMS chuẩn
+          layers="radar:new_north_vietnam_2025_provinces"
+          styles="polygon_nofill"
+          format="image/png"
+          transparent={true}
+          version="1.1.1" // Thêm version để ổn định
+          params={{
+            tiled: true, // Ép GeoServer kiểm tra cache GWC
+          }}
+          pane="Provinces2"
+        />

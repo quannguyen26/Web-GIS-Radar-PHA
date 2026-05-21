@@ -11,7 +11,7 @@ const DashBoard = () => {
   const [selections, setSelections] = useState(defaultSelections);
   return (
     <div
-      className={`font-jakarta relative mx-auto flex h-screen w-full max-w-388.25 overflow-hidden bg-gray-50 text-gray-900 transition-colors duration-500 dark:bg-[#0f172a] dark:text-slate-200 ${isDarkMode ? "dark" : ""}`}
+      className={`font-jakarta relative mx-auto flex h-screen w-full overflow-hidden bg-gray-50 text-gray-900 transition-colors duration-500 dark:bg-[#0f172a] dark:text-slate-200 ${isDarkMode ? "dark" : ""}`}
     >
       <SideBar
         isSidebarOpen={isSidebarOpen}
