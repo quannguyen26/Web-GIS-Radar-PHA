@@ -4,6 +4,7 @@ import L from "leaflet";
 import { useSelection } from "../context/SelectionContext";
 import AnimationControl from "../ui/AnimationControl";
 import ProductLegend from "./ProductLegend";
+import GetMapInfoHandler from "../handler/GetMapInfoHandler";
 
 const ProductLayer = () => {
   const [timeline, setTimeline] = useState({ list: [], index: 0 });
@@ -79,6 +80,9 @@ const ProductLayer = () => {
           crs: L.CRS.EPSG3857,
         }}
       />
+
+      <GetMapInfoHandler timeline={timeline} />
+
       <AnimationControl timeline={timeline} setTimeline={setTimeline} />
 
       <ProductLegend activeProduct={product} />

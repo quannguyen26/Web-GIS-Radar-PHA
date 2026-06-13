@@ -12,10 +12,10 @@ export const defaultSelections = {
     name: "Pha Đin",
   },
   products: {
-    name: "HMAX",
+    name: "MAX",
   },
   region: {
-    name: "Tất cả",
+    name: "Cấp tỉnh",
   },
 };
 
@@ -65,26 +65,22 @@ export const dropdownConfigs = [
   },
   {
     id: "region",
-    label: "Tình thành",
+    label: "Lớp hành chính",
     icon: MapPin,
     iconColor: "text-emerald-500",
     options: [
       {
-        name: "Tất cả",
+        name: "Cấp tỉnh",
         status: "active",
       },
       {
-        name: "Sơn La",
+        name: "Cấp xã",
         status: "deactive",
       },
       {
-        name: "Điện Biên",
+        name: "Xã gộp",
         status: "deactive",
-      },
-      {
-        name: "Lai Châu",
-        status: "deactive",
-      },
+      }
     ],
   },
 ];
