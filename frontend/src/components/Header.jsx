@@ -1,5 +1,5 @@
 import React from "react";
-import { Menu, Search, Sun, Bell, Moon } from "lucide-react";
+import { Menu, Search, Sun, Bell, Moon, LogIn } from "lucide-react";
 import Button from "./ui/Button";
 import { useState, useEffect } from "react";
 const Header = ({
@@ -76,8 +76,9 @@ const Header = ({
 
         <div className="mx-1 h-8 w-px bg-gray-200 dark:bg-slate-800"></div>
 
-        <Button className="rounded-lg bg-indigo-500 px-4 py-2.5 text-xs font-bold text-white transition-all hover:bg-indigo-600">
-          Đăng nhập
+        <Button className="flex items-center gap-2 rounded-xl bg-indigo-600 p-2 text-white shadow-lg shadow-indigo-600/20 transition-all hover:bg-indigo-700 active:scale-95 md:px-4 md:py-2.5 dark:shadow-none">
+          <LogIn size={20} className="shrink-0" />
+          <span className="hidden text-sm font-bold md:block">Đăng nhập</span>
         </Button>
       </div>
     </header>

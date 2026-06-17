@@ -61,7 +61,7 @@ const AnimationControl = ({ timeline, setTimeline }) => {
     }));
   };
   return (
-    <div className="absolute top-3 left-3 right-3 z-1000 md:top-4 md:right-20 md:left-auto md:w-80">
+    <div className="absolute top-3 left-3 right-3 z-1000 md:top-4 md:right-4 md:left-auto md:w-80">
       <div className="rounded-2xl border border-slate-200 bg-white/95 p-3 shadow-2xl backdrop-blur-md md:rounded-3xl md:p-4 dark:border-slate-700 dark:bg-slate-900/90">
         {/* Dropdown chọn thời gian */}
         <div className="relative mb-3 md:mb-4" ref={dropdownRef}>

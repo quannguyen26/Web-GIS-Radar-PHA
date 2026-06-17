@@ -75,11 +75,11 @@ export const dropdownConfigs = [
       },
       {
         name: "Cấp xã",
-        status: "deactive",
+        status: "active",
       },
       {
-        name: "Xã gộp",
-        status: "deactive",
+        name: "Điểm dự báo",
+        status: "active",
       }
     ],
   },
@@ -87,13 +87,13 @@ export const dropdownConfigs = [
 
 export const buttonNavItems = [
   {
-    name: "Con trỏ",
+    name: "Bàn đồ",
     icon: MousePointerClick,
     active: true,
   },
   { name: "Bản tin", icon: Newspaper, active: false },
 
-  { name: "Cài đặt", icon: Settings, active: false },
+  { name: "Trạng thái hệ thống", icon: Settings, active: false },
 ];
 
 export const productLegendConfigs = {

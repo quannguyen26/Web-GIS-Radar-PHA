@@ -6,11 +6,20 @@ import AnimationControl from "../ui/AnimationControl";
 import ProductLegend from "./ProductLegend";
 import GetMapInfoHandler from "../handler/GetMapInfoHandler";
 
-const ProductLayer = () => {
-  const [timeline, setTimeline] = useState({ list: [], index: 0 });
+// Sử dụng .memo để tránh parent render
+const ProductLayer = React.memo(() => {
   const { selections } = useSelection();
+  const productName = selections.products.name;
 
-  let product = selections.products.name;
+  // Sử dụng useMemo để đảm bảo ProductLayerContent chỉ render lại khi sản phẩm thực sự thay đổi
+  return useMemo(
+    () => <ProductLayerContent key={productName} product={productName} />,
+    [productName],
+  );
+});
+
+const ProductLayerContent = ({ product }) => {
+  const [timeline, setTimeline] = useState({ list: [], index: 0 });
 
   useEffect(() => {
     const eventSource = new EventSource(
@@ -23,7 +32,6 @@ const ProductLayer = () => {
 
         // Trường hợp 1: Nhận dữ liệu khởi tạo (danh sách 6 mốc)
         if (data.timestamps) {
-          //console.log(`Dữ liệu khởi tạo cho [${product}]:`, data.timestamps);
           setTimeline({
             list: data.timestamps,
             index: data.timestamps.length - 1,
@@ -59,14 +67,14 @@ const ProductLayer = () => {
 
     return () => {
       eventSource.close();
-      //console.log(`Đã ngắt kết nối SSE cho sản phẩm: ${product}`);
     };
   }, [product]);
 
-  if (timeline.list.length === 0) return null;
+  if (!timeline.list || timeline.list.length === 0) return null;
 
   return (
     <>
+      {console.log(`[RENDER] ProductLayerContent for: ${product}`)}
       <WMSTileLayer
         key={`${product}-${timeline.list[timeline.index]}`}
         url="https://radarphadin.com.vn/geoserver/radar/gwc/service/wms"
@@ -80,7 +88,6 @@ const ProductLayer = () => {
           crs: L.CRS.EPSG3857,
         }}
       />
-
       <GetMapInfoHandler timeline={timeline} />
 
       <AnimationControl timeline={timeline} setTimeline={setTimeline} />
@@ -89,4 +96,5 @@ const ProductLayer = () => {
     </>
   );
 };
-export default React.memo(ProductLayer);
+
+export default ProductLayer;

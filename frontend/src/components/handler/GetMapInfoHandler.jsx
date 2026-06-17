@@ -1,8 +1,9 @@
+import { useEffect } from "react";
 import { GeoJSON, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useSelection } from "../context/SelectionContext";
-import { productLegendConfigs } from "../../lib/data";
+import { productLegendConfigs, dropdownConfigs } from "../../lib/data";
 
 /**
  * Component xử lý lấy thông tin thuộc tính (GetFeatureInfo) khi click vào bản đồ
@@ -10,6 +11,7 @@ import { productLegendConfigs } from "../../lib/data";
 const GetMapInfoHandler = ({ timeline }) => {
   const { selections } = useSelection();
   const activeProduct = selections.products.name;
+  const activeLayer = selections.region.name;
   const unitProduct = productLegendConfigs[activeProduct]?.unit || "";
   const currentTime = timeline?.list[timeline?.index];
 
@@ -18,10 +20,12 @@ const GetMapInfoHandler = ({ timeline }) => {
       const size = map.getSize();
       const point = map.latLngToContainerPoint(e.latlng);
       const bounds = map.getBounds();
+      const districtsLayer =
+        activeLayer === dropdownConfigs[2].options[2].name
+          ? "radar:new_merge_districts_2025"
+          : "radar:new_north_vietnam_2025_districts";
 
-      const districtsLayer = "radar:new_north_vietnam_2025_districts";
       const productLayer = `radar:${activeProduct.toLowerCase()}_mosaic_index`;
-
       // 1. Lấy tọa độ 2 điểm góc dưới-trái và trên-phải (hệ 4326)
       const southWest = bounds.getSouthWest();
       const northEast = bounds.getNorthEast();
@@ -61,7 +65,7 @@ const GetMapInfoHandler = ({ timeline }) => {
 
           // 1. Tìm feature của đơn vị hành chính
           const adminFeature = data.features.find(
-            (f) => f.properties && (f.properties.tenXa || f.properties.tenTinh),
+            (f) => f.properties && (f.properties.tenXa || f.properties.xa_gop),
           );
 
           // 2. Tìm feature của sản phẩm radar dựa vào sự tồn tại của thuộc tính 'GRAY_INDEX'
@@ -71,23 +75,32 @@ const GetMapInfoHandler = ({ timeline }) => {
 
           if (adminFeature) {
             const p = adminFeature.properties;
-            const adminName = p.tenXa ? `${p.loaiXa || ""} ${p.tenXa}` : p.tenTinh;
-            const provincePart = p.tenXa ? `<div class="text-[11px] text-slate-500 dark:text-slate-400 italic">(${p.tenTinh})</div>` : "";
+            const adminName = p.tenXa
+              ? `${p.loaiXa || ""} ${p.tenXa}`
+              : `${p.loaiXa || ""} ${p.xa_gop}`;
+            const provincePart =
+              p.tenXa || p.xa_gop
+                ? `<div class="text-[11px] text-slate-500 dark:text-slate-400 italic">(${p.tenTinh})</div>`
+                : "";
 
             content += `
-              <div class="text-sm font-bold text-slate-900 leading-tight mb-0.5">
+              <div class="text-sm font-bold text-slate-700  dark:text-slate-200 leading-tight mb-0.5">
                 ${adminName}
               </div>
               ${provincePart}
             `;
           }
 
-          if (productFeature && productFeature.properties.GRAY_INDEX !== undefined) {
+          if (
+            productFeature &&
+            productFeature.properties.GRAY_INDEX !== undefined
+          ) {
             const value = productFeature.properties.GRAY_INDEX;
-            const formattedValue = value != null ? Number(value).toFixed(1) : "0.0";
+            const formattedValue =
+              value != null ? Number(value).toFixed(1) : "0.0";
             content += `
               <div class="mt-1 flex justify-center items-baseline gap-1 dark:border-slate-800">
-                <span class="text-[15px] font-black text-indigo-600 dark:text-indigo-400">${formattedValue}</span>
+                <span class="text-[15px] font-black text-indigo-700">${formattedValue}</span>
                 <span class="text-[13px] font-bold text-slate-400 dark:text-slate-500 tracking-tight">${unitProduct}</span>
               </div>
             `;
@@ -95,8 +108,10 @@ const GetMapInfoHandler = ({ timeline }) => {
 
           if (content) {
             L.popup({
-              minWidth: 140,
-              className: "custom-radar-popup"
+              minWidth: 150,
+              className: "custom-radar-popup",
+              // Khoảng cách an toàn để không bị che bởi UI (Top: 80px, Bottom: 100px)
+              autoPanPadding: [20, 100], 
             })
               .setLatLng(e.latlng)
               .setContent(`<div class="flex flex-col">${content}</div>`)
@@ -108,6 +123,16 @@ const GetMapInfoHandler = ({ timeline }) => {
       }
     },
   });
+
+  // Tự động đóng popup khi đổi sản phẩm, lớp bản đồ hoặc mốc thời gian
+  useEffect(() => {
+    map.closePopup();
+    // Cleanup: Đảm bảo popup được đóng khi component bị unmount (ví dụ khi đổi sản phẩm)
+    return () => {
+      map.closePopup();
+    };
+  }, [map, activeProduct, activeLayer, currentTime]);
+
   return null;
 };
 
