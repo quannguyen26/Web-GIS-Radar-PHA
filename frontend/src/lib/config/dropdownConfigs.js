@@ -1,8 +1,4 @@
-import {
-  Server,
-  MapPin,
-  SatelliteDish,
-} from "lucide-react";
+import { Server, MapPin, SatelliteDish } from "lucide-react";
 
 export const defaultSelections = {
   stations: {
@@ -12,7 +8,7 @@ export const defaultSelections = {
     name: "MAX",
   },
   region: {
-    name: "Cấp tỉnh",
+    name: "Bắc Bộ",
   },
 };
 
@@ -62,20 +58,28 @@ export const dropdownConfigs = [
   },
   {
     id: "region",
-    label: "Lớp hành chính",
+    label: "Vị trí",
     icon: MapPin,
     iconColor: "text-emerald-500",
     options: [
       {
-        name: "Cấp tỉnh",
+        name: "Bắc Bộ",
         status: "active",
       },
       {
-        name: "Cấp xã",
+        name: "Sơn La",
         status: "active",
       },
       {
-        name: "Điểm dự báo",
+        name: "Điện Biên",
+        status: "active",
+      },
+      {
+        name: "Lai Châu",
+        status: "active",
+      },
+      {
+        name: "Lào Cai",
         status: "active",
       },
     ],
