@@ -2,58 +2,54 @@ import {
   MapContainer,
   TileLayer,
   Pane,
-  LayersControl,
   WMSTileLayer,
+  useMap,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import ProductLayer from "./ProductLayer";
 import { useSelection } from "../../context/SelectionContext";
 import { useTheme } from "../../context/ThemeContext";
-import { GEOSERVER_WMTS_URL } from "../../lib/constants";
+import {
+  GEOSERVER_WMS_URL,
+  GEOSERVER_WMTS_URL,
+  locationPHA,
+} from "../../lib/constants";
 import { boundsNorthVN } from "../../lib/constants";
-import { useState } from "react";
-import { useMapEvents } from "react-leaflet";
-
-const ZoomTracker = ({ setZoomLevel }) => {
-  useMapEvents({
-    zoomend: (e) => {
-      setZoomLevel(e.target.getZoom());
-    },
-  });
-  return null;
-};
-
-const wmsOptions = {
-  layers: "radar:new_north_vietnam_2025_districts",
-  styles: "radar:district_style",
-  format: "image/png",
-  transparent: true,
-  version: "1.1.1",
-  pane: "paneDistricts", // Hoặc '1.3.0' tùy cấu hình GeoServer
-
-  // THÊM ĐIỀU KIỆN CQL_FILTER Ở ĐÂY
-  // Ví dụ: Chỉ lọc các huyện thuộc tỉnh Sơn La (thay tên trường và giá trị đúng với DB của bạn)
-  cql_filter: "tenTinh = 'Sơn La'",
-};
+import { useState, useEffect } from "react";
+import ZoomTracker from "./ZoomTracker";
+import { dropdownConfigs } from "../../lib/config/dropdownConfigs";
 
 const MapView = () => {
   const { selections } = useSelection();
   const { isDarkMode } = useTheme();
-
   const [zoomLevel, setZoomLevel] = useState(7);
 
   const selectedRegion = selections.region.name;
+  const selectedCenter = dropdownConfigs[2].options.find(
+    (opt) => opt.name === selectedRegion,
+  ).centerLocation;
+
+  console.log(selectedCenter);
+
+  const CenterUpdater = () => {
+    const map = useMap();
+    useEffect(() => {
+      map.fitBounds(selectedCenter, { maxZoom: 10 });
+    }, [selectedCenter, map]);
+    return null;
+  };
+
   const themeKey = isDarkMode ? "dark" : "light";
 
   return (
     <main className="z-30 flex min-h-0 w-full flex-1 overflow-hidden">
       <MapContainer
-        center={[21.57139, 103.51694]}
+        center={locationPHA}
         zoom={7}
         minZoom={7}
         maxZoom={10}
-        zoomSnap={1}
-        zoomDelta={1}
+        zoomSnap={0.5}
+        zoomDelta={0.5}
         wheelPxPerZoomLevel={120}
         maxBounds={boundsNorthVN}
         scrollWheelZoom={true}
@@ -99,7 +95,7 @@ const MapView = () => {
             />
           ) : (
             <WMSTileLayer
-              url="https://radarphadin.com.vn/geoserver/radar/wms"
+              url={`${GEOSERVER_WMS_URL}`}
               layers="radar:new_north_vietnam_2025_districts"
               format="image/png"
               transparent={true}
@@ -110,7 +106,10 @@ const MapView = () => {
             />
           ))}
 
+        {console.log(zoomLevel)}
+
         <ProductLayer key="radar-product-layer" />
+        <CenterUpdater />
       </MapContainer>
     </main>
   );

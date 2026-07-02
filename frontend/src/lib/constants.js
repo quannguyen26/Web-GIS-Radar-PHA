@@ -16,3 +16,6 @@ export const GEOSERVER_WMSC_URL = `${GEOSERVER_BASE_URL}/radar/gwc/service/wms`;
 export const GEOSERVER_WMTS_URL = `${GEOSERVER_BASE_URL}/gwc/service/wmts`;
 
 export const boundsNorthVN = L.latLngBounds([17.7, 101.5], [25.2, 108.0]);
+
+// ** location PHA radar
+export const locationPHA = [21.57139, 103.51694];

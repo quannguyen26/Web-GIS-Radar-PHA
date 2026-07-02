@@ -21,6 +21,7 @@ const GetMapInfoHandler = ({ timeline }) => {
     click: async (e) => {
       const size = map.getSize();
       const point = map.latLngToContainerPoint(e.latlng);
+      console.log(e.latlng);
       const bounds = map.getBounds();
       const districtsLayer =
         activeLayer === dropdownConfigs[2].options[2].name
