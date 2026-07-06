@@ -8,7 +8,7 @@ const SideBar = ({ isSidebarOpen, isMobileMenuOpen, setIsMobileMenuOpen }) => {
     <>
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 transition-opacity duration-300 animate-in fade-in z-45 bg-black/60 backdrop-blur-sm md:hidden"
+          className="animate-in fade-in fixed inset-0 z-45 bg-black/60 backdrop-blur-sm transition-opacity duration-300 md:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}

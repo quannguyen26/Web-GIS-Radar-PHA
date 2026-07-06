@@ -10,7 +10,8 @@ export const SelectionProvider = ({ children }) => {
 
   return (
     <SelectionContext.Provider value={value}>
-      {children}
+      {" "}
+      {children}{" "}
     </SelectionContext.Provider>
   );
 };

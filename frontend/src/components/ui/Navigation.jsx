@@ -64,7 +64,7 @@ const Navigation = ({ isSidebarOpen, isMobileMenuOpen }) => {
 
               {/* Drop down */}
               {isOpen && showText && (
-                <div className="animate-in fade-in slide-in-from-top-2 absolute top-full right-0 left-0 z-20 mt-1 rounded-2xl border border-gray-100 bg-white p-2 shadow-2xl duration-200 dark:border-slate-700 dark:bg-[#1e293b]">
+                <div className="animate-in fade-in slide-in-from-top-2 absolute top-full right-0 left-0 z-20 mt-1 max-h-[136px] overflow-y-auto rounded-2xl border border-gray-100 bg-white p-2 shadow-2xl duration-200 dark:border-slate-700 dark:bg-[#1e293b] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-200 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-track]:bg-transparent">
                   {config.options.map((opt, i) => {
                     const isDeactive = opt.status === "deactive";
                     return (
