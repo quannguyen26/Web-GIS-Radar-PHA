@@ -4,6 +4,7 @@ import Header from "../components/layout/Header";
 import MapView from "../components/map/MapView";
 import { SelectionProvider } from "../context/SelectionContext";
 import { ThemeProvider } from "../context/ThemeContext";
+import MainContent from "../components/layout/MainContent";
 
 const DashBoard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -25,7 +26,7 @@ const DashBoard = () => {
                 setIsSidebarOpen={setIsSidebarOpen}
                 setIsMobileMenuOpen={setIsMobileMenuOpen}
               />
-              <MapView />
+              <MainContent />
             </div>
           </div>
         </div>

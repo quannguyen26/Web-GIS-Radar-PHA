@@ -65,19 +65,22 @@ const ProductLayerContent = ({ product }) => {
 
   return (
     <>
-      <WMSTileLayer
-        key={`${product}-${timeline.list[timeline.index]}`}
-        url={GEOSERVER_WMSC_URL}
-        params={{
-          layers: `radar:${product.toLowerCase()}_mosaic_index`,
-          format: "image/png",
-          transparent: true,
-          version: "1.1.1",
-          time: timeline.list[timeline.index],
-          pane: "paneRadar",
-          crs: L.CRS.EPSG3857,
-        }}
-      />
+      {timeline.list.map((time, idx) => (
+        <WMSTileLayer
+          key={`${product}-${time}`}
+          url={GEOSERVER_WMSC_URL}
+          opacity={idx === timeline.index ? 1 : 0}
+          params={{
+            layers: `radar:${product.toLowerCase()}_mosaic_index`,
+            format: "image/png",
+            transparent: true,
+            version: "1.1.1",
+            time: time,
+            pane: "paneRadar",
+            crs: L.CRS.EPSG3857,
+          }}
+        />
+      ))}
       <GetMapInfoHandler timeline={timeline} />
       <AnimationControl timeline={timeline} setTimeline={setTimeline} />
       <ProductLegend activeProduct={product} />

@@ -20,18 +20,18 @@ const ProductLegend = ({ activeProduct }) => {
       {config && (
         <div
           ref={containerRef}
-          className="animate-in fade-in slide-in-from-right-2 absolute bottom-5 left-2 z-1000 w-14 rounded-xl border border-slate-200 bg-white/90 p-2 shadow-2xl backdrop-blur-md duration-300 md:right-4 md:bottom-5 md:left-auto md:w-16 md:p-2.5 dark:border-slate-800 dark:bg-slate-900/90"
+          className="animate-in fade-in slide-in-from-right-2 absolute bottom-3 left-1.5 z-1000 w-11 rounded-lg border border-slate-200 bg-white/90 p-1.5 shadow-2xl backdrop-blur-md duration-300 sm:bottom-4 sm:left-2 sm:w-13 sm:rounded-xl sm:p-2 md:right-4 md:bottom-5 md:left-auto md:w-16 md:rounded-xl md:p-2.5 dark:border-slate-800 dark:bg-slate-900/90"
         >
           {/* Header  */}
-          <div className="mb-2 flex flex-col items-center gap-2 border-b border-slate-200/50 pb-2 dark:border-slate-700/50">
-            <span className="text-[13px] font-black tracking-tighter text-slate-400 dark:text-slate-500">
+          <div className="mb-1 flex flex-col items-center gap-1.5 pb-1.5 sm:gap-2 sm:pb-2">
+            <span className="text-[10px] font-black tracking-tighter text-slate-400 sm:text-[11px] md:text-[13px] dark:text-slate-500">
               {config.unit}
             </span>
 
-            <div className="flex h-48 items-stretch gap-2 md:h-64">
+            <div className="flex h-36 items-stretch gap-1 sm:h-44 sm:gap-1.5 md:h-64 md:gap-2">
               {/* Color Bar Gradient */}
               <div
-                className="w-2.5 shrink-0 overflow-hidden rounded-sm border border-black/5 shadow-inner md:w-3 dark:border-white/10"
+                className="w-2 shrink-0 overflow-hidden rounded-sm border border-black/5 shadow-inner sm:w-2.5 md:w-3 dark:border-white/10"
                 style={{
                   background: `linear-gradient(to top, ${config.steps.map((s) => s.color).join(",")})`,
                 }}
@@ -51,7 +51,7 @@ const ProductLegend = ({ activeProduct }) => {
                     >
                       {showLabel && (
                         <>
-                          <span className="text-[9px] font-bold text-slate-500 tabular-nums md:text-[11px] dark:text-slate-400">
+                          <span className="text-[7px] font-bold text-slate-500 tabular-nums sm:text-[8px] md:text-[11px] dark:text-slate-400">
                             {step.value}
                           </span>
                         </>
