@@ -70,34 +70,50 @@ const MapView = () => {
       {/* North Viet Nam Provinces Mask Dark/Light Layer */}
       <TileLayer
         key={`${themeKey}-provinces-mask`}
-        url={`${GEOSERVER_WMTS_URL}?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&LAYER=radar:new_north_vietnam_2025_provinces&STYLE=radar:${themeKey}-provinces-mask&TILEMATRIXSET=EPSG:3857&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/png`}
+        url={`${GEOSERVER_WMTS_URL}?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&LAYER=radar:all_new_provinces_2025&STYLE=radar:${themeKey}-provinces-mask&TILEMATRIXSET=EPSG:3857&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/png`}
         pane="paneMaskProvinces"
         transparent={true}
+        bounds={[
+          [16.188278988000036, 102.14388732800006],
+          [23.392738122000026, 108.19501653500004],
+        ]}
       />
       {/* North Viet Nam Provinces Boundary Layer */}
       <TileLayer
         key={`${themeKey}_provinces_style`}
-        url={`${GEOSERVER_WMTS_URL}?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&LAYER=radar:new_north_vietnam_2025_provinces&STYLE=radar:${themeKey}_province_style&TILEMATRIXSET=EPSG:3857&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/png`}
+        url={`${GEOSERVER_WMTS_URL}?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&LAYER=radar:all_new_provinces_2025&STYLE=radar:${themeKey}_province_style&TILEMATRIXSET=EPSG:3857&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/png`}
         pane="paneBoundaryProvinces"
         transparent={true}
+        bounds={[
+          [16.188278988000036, 102.14388732800006],
+          [23.392738122000026, 108.19501653500004],
+        ]}
       />{" "}
       {zoomLevel >= 8 &&
         (selectedRegion === "Bắc Bộ" ? (
           <TileLayer
             key="district-layer"
-            url={`${GEOSERVER_WMTS_URL}?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&LAYER=radar:new_north_vietnam_2025_districts&STYLE=radar:district_style&TILEMATRIXSET=EPSG:3857&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/png`}
+            url={`${GEOSERVER_WMTS_URL}?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&LAYER=radar:all_new_districts_2025&STYLE=radar:district_style&TILEMATRIXSET=EPSG:3857&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/png`}
             pane="paneDistricts"
             transparent={true}
+            bounds={[
+              [19.287700909000023, 102.14388732800006],
+              [23.392738122000026, 108.19501653500004],
+            ]}
           />
         ) : (
           <WMSTileLayer
             url={`${GEOSERVER_WMS_URL}`}
-            layers="radar:new_north_vietnam_2025_districts"
+            layers="radar:all_new_districts_2025"
             format="image/png"
             transparent={true}
             version="1.1.1"
             styles="radar:district_style"
             pane="paneDistricts"
+            bounds={[
+              [19.287700909000023, 102.14388732800006],
+              [23.392738122000026, 108.19501653500004],
+            ]}
             params={{ CQL_FILTER: `tenTinh = '${selectedRegion}'` }}
           />
         ))}
