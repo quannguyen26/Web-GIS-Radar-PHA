@@ -24,7 +24,7 @@ const GetMapInfoHandler = ({ timeline }) => {
       const bounds = map.getBounds();
       const districtsLayer = layerVisibility.mergeDistricts
         ? "radar:new_merge_districts_2025"
-        : "radar:new_north_vietnam_2025_districts";
+        : "radar:all_new_districts_2025";
 
       const productLayer = `radar:${activeProduct.toLowerCase()}_mosaic_index`;
 
@@ -67,7 +67,7 @@ const GetMapInfoHandler = ({ timeline }) => {
 
           // 1. Tìm feature của đơn vị hành chính
           const adminFeature = data.features.find(
-            (f) => f.properties && (f.properties.tenXa || f.properties.xa_gop),
+            (f) => f.properties && (f.properties.tenxa || f.properties.xa_gop),
           );
 
           // 2. Tìm feature của sản phẩm radar dựa vào sự tồn tại của thuộc tính 'GRAY_INDEX'
@@ -77,12 +77,12 @@ const GetMapInfoHandler = ({ timeline }) => {
 
           if (adminFeature) {
             const p = adminFeature.properties;
-            const adminName = p.tenXa
-              ? `${p.loaiXa || ""} ${p.tenXa}`
-              : `${p.loaiXa || ""} ${p.xa_gop}`;
+            const adminName = p.tenxa
+              ? `${p.loaixa || ""} ${p.tenxa}`
+              : `${p.loaixa || ""} ${p.xa_gop}`;
             const provincePart =
-              p.tenXa || p.xa_gop
-                ? `<div class="text-[11px] text-slate-500 dark:text-slate-400 italic">(${p.tenTinh})</div>`
+              p.tenxa || p.xa_gop
+                ? `<div class="text-[11px] text-slate-500 dark:text-slate-400 italic">(${p.tentinh})</div>`
                 : "";
 
             content += `
