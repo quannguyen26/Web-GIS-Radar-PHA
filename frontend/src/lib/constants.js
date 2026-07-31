@@ -15,6 +15,10 @@ export const GEOSERVER_WMSC_URL = `${GEOSERVER_BASE_URL}/radar/gwc/service/wms`;
 /** URL WMTS của GeoServer (dùng cho base/boundary layers) */
 export const GEOSERVER_WMTS_URL = `${GEOSERVER_BASE_URL}/gwc/service/wmts`;
 
+/** URL WFS của GeoServer (dùng để fetch data JSON) */
+
+export const GEOSERVER_WFS_URL = `${GEOSERVER_BASE_URL}/radar/wfs`;
+
 export const boundsNorthVN = L.latLngBounds([17.7, 101.5], [25.2, 108.0]);
 
 // ** location PHA radar

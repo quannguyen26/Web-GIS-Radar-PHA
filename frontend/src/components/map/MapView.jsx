@@ -21,6 +21,7 @@ import ZoomTracker from "./ZoomTracker";
 import CenterUpdater from "./CenterUpdate";
 import LayerControl from "../ui/LayerControl";
 import { dropdownConfigs } from "../../lib/config/dropdownConfigs";
+import ProvinceWFSLayer from "../ui/ProvinceWFSLayer";
 
 /** Danh sách trạm ra đa từ config */
 const radarStations =
@@ -33,7 +34,6 @@ const MapView = () => {
   const { isDarkMode } = useTheme();
   // ** mức zoom */
   const [zoomLevel, setZoomLevel] = useState(7);
-  // ** dd */
   const selectedRegion = selections.region.name;
 
   const themeKey = isDarkMode ? "dark" : "light";
@@ -61,6 +61,7 @@ const MapView = () => {
       <Pane name="paneStations" style={{ zIndex: 700 }} />
       <Pane name="paneMergeDistricts" style={{ zIndex: 650 }} />
       {/* Base Map Dark/Light Layer */}
+      <ProvinceWFSLayer currentZoom={zoomLevel} />
       <TileLayer
         key={`layer-base-${themeKey}`}
         url={`https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_${
@@ -79,7 +80,7 @@ const MapView = () => {
         ]}
       />
       {/* North Viet Nam Provinces Boundary Layer */}
-      <TileLayer
+      {/* <TileLayer
         key={`${themeKey}_provinces_style`}
         url={`${GEOSERVER_WMTS_URL}?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&LAYER=radar:all_new_provinces_2025&STYLE=radar:${themeKey}_province_style&TILEMATRIXSET=EPSG:3857&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/png`}
         pane="paneBoundaryProvinces"
@@ -88,8 +89,8 @@ const MapView = () => {
           [16.188278988000036, 102.14388732800006],
           [23.392738122000026, 108.19501653500004],
         ]}
-      />{" "}
-      {zoomLevel >= 8 &&
+      />{" "} */}
+      {/* {zoomLevel >= 8 &&
         (selectedRegion === "Bắc Bộ" ? (
           <TileLayer
             key="district-layer"
@@ -116,7 +117,7 @@ const MapView = () => {
             ]}
             params={{ CQL_FILTER: `tenTinh = '${selectedRegion}'` }}
           />
-        ))}
+        ))} */}
       {/* === Lớp Trạm Ra đa (toggle) === */}
       {layerVisibility.radarStations &&
         radarStations.map((station) => (

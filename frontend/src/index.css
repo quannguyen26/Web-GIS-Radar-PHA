@@ -92,3 +92,58 @@
   border-color: rgba(99, 102, 241, 0.4) !important;
   color: #e2e8f0 !important;
 }
+
+/* Tooltip for WFS Admin Boundaries (Provinces/Districts) */
+.wfs-feature-tooltip {
+  font-family: var(--font-jakarta) !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  padding: 4px 8px !important;
+  border-radius: 6px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid rgba(203, 213, 225, 0.9) !important; /* slate-300 */
+  color: #ff0000 !important; /* slate-800 */
+  backdrop-filter: blur(0px);
+  white-space: nowrap;
+}
+
+/* Arrow styling for light mode */
+.leaflet-tooltip-top.wfs-feature-tooltip::before {
+  border-top-color: rgba(255, 255, 255, 0.95) !important;
+}
+.leaflet-tooltip-bottom.wfs-feature-tooltip::before {
+  border-bottom-color: rgba(255, 255, 255, 0.95) !important;
+}
+.leaflet-tooltip-left.wfs-feature-tooltip::before {
+  border-left-color: rgba(255, 255, 255, 0.95) !important;
+}
+.leaflet-tooltip-right.wfs-feature-tooltip::before {
+  border-right-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Dark mode support */
+.dark .wfs-feature-tooltip {
+  background-color: rgba(15, 23, 42, 0.95) !important; /* slate-900 */
+  border-color: rgba(51, 65, 85, 0.9) !important; /* slate-700 */
+  color: #f8fafc !important; /* slate-50 */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Arrow styling for dark mode */
+.dark .leaflet-tooltip-top.wfs-feature-tooltip::before {
+  border-top-color: rgba(15, 23, 42, 0.95) !important;
+}
+.dark .leaflet-tooltip-bottom.wfs-feature-tooltip::before {
+  border-bottom-color: rgba(15, 23, 42, 0.95) !important;
+}
+.dark .leaflet-tooltip-left.wfs-feature-tooltip::before {
+  border-left-color: rgba(15, 23, 42, 0.95) !important;
+}
+.dark .leaflet-tooltip-right.wfs-feature-tooltip::before {
+  border-right-color: rgba(15, 23, 42, 0.95) !important;
+}
+
+.leaflet-interactive:focus {
+  outline: none !important;
+}
