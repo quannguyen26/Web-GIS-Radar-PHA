@@ -21,7 +21,7 @@ import ZoomTracker from "./ZoomTracker";
 import CenterUpdater from "./CenterUpdate";
 import LayerControl from "../ui/LayerControl";
 import { dropdownConfigs } from "../../lib/config/dropdownConfigs";
-import ProvinceWFSLayer from "../ui/ProvinceWFSLayer";
+import ProvinceWFSLayer from "../ui/WFSLayer";
 
 /** Danh sách trạm ra đa từ config */
 const radarStations =
