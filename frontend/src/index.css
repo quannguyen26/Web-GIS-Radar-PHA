@@ -95,16 +95,17 @@
 
 /* Tooltip for WFS Admin Boundaries (Provinces/Districts) */
 .wfs-feature-tooltip {
+  text-align: center;
   font-family: var(--font-jakarta) !important;
   font-size: 12px !important;
   font-weight: 700 !important;
-  padding: 4px 8px !important;
+  padding: 8px !important;
   border-radius: 6px !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
   background-color: rgba(255, 255, 255, 0.95) !important;
   border: 1px solid rgba(203, 213, 225, 0.9) !important; /* slate-300 */
-  color: #ff0000 !important; /* slate-800 */
-  backdrop-filter: blur(0px);
+  color: #960e0e !important; /* slate-800 */
+  /* backdrop-filter: blur(100px); */
   white-space: nowrap;
 }
 
