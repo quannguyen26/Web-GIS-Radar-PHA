@@ -21,7 +21,8 @@ import ZoomTracker from "./ZoomTracker";
 import CenterUpdater from "./CenterUpdate";
 import LayerControl from "../ui/LayerControl";
 import { dropdownConfigs } from "../../lib/config/dropdownConfigs";
-import ProvinceWFSLayer from "../ui/WFSLayer";
+import WFSLayer from "../ui/WFSLayer";
+import MapTooltipCleaner from "./MapTooltipCleaner";
 
 /** Danh sách trạm ra đa từ config */
 const radarStations =
@@ -32,7 +33,6 @@ const radarStations =
 const MapView = () => {
   const { selections, layerVisibility, setLayerVisibility } = useSelection();
   const { isDarkMode } = useTheme();
-  // ** mức zoom */
   const [zoomLevel, setZoomLevel] = useState(7);
   const selectedRegion = selections.region.name;
 
@@ -60,8 +60,8 @@ const MapView = () => {
       <Pane name="paneDistricts" style={{ zIndex: 640 }} />
       <Pane name="paneStations" style={{ zIndex: 700 }} />
       <Pane name="paneMergeDistricts" style={{ zIndex: 650 }} />
+      <WFSLayer currentZoom={zoomLevel} />
       {/* Base Map Dark/Light Layer */}
-      <ProvinceWFSLayer currentZoom={zoomLevel} />
       <TileLayer
         key={`layer-base-${themeKey}`}
         url={`https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_${
@@ -79,45 +79,6 @@ const MapView = () => {
           [23.392738122000026, 108.19501653500004],
         ]}
       />
-      {/* North Viet Nam Provinces Boundary Layer */}
-      {/* <TileLayer
-        key={`${themeKey}_provinces_style`}
-        url={`${GEOSERVER_WMTS_URL}?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&LAYER=radar:all_new_provinces_2025&STYLE=radar:${themeKey}_province_style&TILEMATRIXSET=EPSG:3857&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/png`}
-        pane="paneBoundaryProvinces"
-        transparent={true}
-        bounds={[
-          [16.188278988000036, 102.14388732800006],
-          [23.392738122000026, 108.19501653500004],
-        ]}
-      />{" "} */}
-      {/* {zoomLevel >= 8 &&
-        (selectedRegion === "Bắc Bộ" ? (
-          <TileLayer
-            key="district-layer"
-            url={`${GEOSERVER_WMTS_URL}?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&LAYER=radar:all_new_districts_2025&STYLE=radar:district_style&TILEMATRIXSET=EPSG:3857&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/png`}
-            pane="paneDistricts"
-            transparent={true}
-            bounds={[
-              [19.287700909000023, 102.14388732800006],
-              [23.392738122000026, 108.19501653500004],
-            ]}
-          />
-        ) : (
-          <WMSTileLayer
-            url={`${GEOSERVER_WMS_URL}`}
-            layers="radar:all_new_districts_2025"
-            format="image/png"
-            transparent={true}
-            version="1.1.1"
-            styles="radar:district_style"
-            pane="paneDistricts"
-            bounds={[
-              [19.287700909000023, 102.14388732800006],
-              [23.392738122000026, 108.19501653500004],
-            ]}
-            params={{ CQL_FILTER: `tenTinh = '${selectedRegion}'` }}
-          />
-        ))} */}
       {/* === Lớp Trạm Ra đa (toggle) === */}
       {layerVisibility.radarStations &&
         radarStations.map((station) => (

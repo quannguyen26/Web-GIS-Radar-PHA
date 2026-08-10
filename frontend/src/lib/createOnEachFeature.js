@@ -33,6 +33,8 @@ const createOnEachFeature = (
       permanent: false,
       direction: "top",
       sticky: true,
+      interactive: false,
+      offset: [0, -5],
       className: "wfs-feature-tooltip",
     });
     // Mouse events for hover styling
@@ -40,13 +42,14 @@ const createOnEachFeature = (
       mouseover: (e) => {
         const target = e.target;
         target.setStyle(hoverStyle);
-        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-          target.bringToFront();
-        }
+        // if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+        //   target.bringToFront();
+        // }
       },
       mouseout: (e) => {
         const target = e.target;
         target.setStyle(baseStyle);
+        target.closeTooltip();
       },
     });
   };

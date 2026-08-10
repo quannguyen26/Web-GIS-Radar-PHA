@@ -3,6 +3,7 @@ import { GeoJSON } from "react-leaflet";
 import { GEOSERVER_WFS_URL } from "../../lib/constants";
 import { useTheme } from "../../context/ThemeContext";
 import createOnEachFeature from "../../lib/createOnEachFeature";
+import MapTooltipCleaner from "../map/MapTooltipCleaner";
 /**
  * Component to fetch and display GeoServer WFS layers for Provinces and Districts.
  *
@@ -12,7 +13,7 @@ import createOnEachFeature from "../../lib/createOnEachFeature";
  * - district layer is fetched and displayed only when current map zoom level > 8.
  *
  */
-const ProvinceWFSLayer = ({ zoomThreshold = 8, currentZoom }) => {
+const WFSLayer = ({ zoomThreshold = 8, currentZoom }) => {
   const [provinceGeoJson, setProvinceGeoJson] = useState(null);
   const [districtGeoJson, setDistrictGeoJson] = useState(null);
   const { isDarkMode } = useTheme();
@@ -52,7 +53,6 @@ const ProvinceWFSLayer = ({ zoomThreshold = 8, currentZoom }) => {
         return res.json();
       })
       .then((data) => {
-        console.log(data);
         if (isMounted) setProvinceGeoJson(data);
       })
       .catch((err) => console.error("Error loading Province WFS layer:", err));
@@ -75,7 +75,6 @@ const ProvinceWFSLayer = ({ zoomThreshold = 8, currentZoom }) => {
         return res.json();
       })
       .then((data) => {
-        console.log(data);
         if (isMounted) setDistrictGeoJson(data);
       })
       .catch((err) => {
@@ -123,4 +122,4 @@ const ProvinceWFSLayer = ({ zoomThreshold = 8, currentZoom }) => {
     </>
   );
 };
-export default ProvinceWFSLayer;
+export default WFSLayer;
