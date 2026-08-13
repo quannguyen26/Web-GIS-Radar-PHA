@@ -13,7 +13,7 @@ const getFeatureDisplayName = (feature, isDistrict = false) => {
     }
   }
 
-  const typeProvince = p.captinh || p.cap_tinh || "";
+  const typeProvince = p.captinh || p.cap_tinh || loaitinh || "";
   const nameProvince = p.tentinh || p.ten_tinh || "";
   if (typeProvince && nameProvince) {
     return `${typeProvince} ${nameProvince}`.trim();

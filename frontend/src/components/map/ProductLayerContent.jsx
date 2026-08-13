@@ -76,7 +76,7 @@ const ProductLayerContent = ({ product }) => {
             transparent: true,
             version: "1.1.1",
             time: time,
-            pane: "paneRadar",
+            pane: "paneRadarProducts",
             crs: L.CRS.EPSG3857,
           }}
         />

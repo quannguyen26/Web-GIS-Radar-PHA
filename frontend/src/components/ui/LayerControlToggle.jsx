@@ -1,37 +1,23 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Layers, ChevronDown, SatelliteDish, Map } from "lucide-react";
 import L from "leaflet";
-import { useMap } from "react-leaflet";
-import { locationPHA } from "../../lib/constants";
 import { useSelection } from "../../context/SelectionContext";
-/**
- * Cấu hình các lớp bản đồ có thể bật/tắt
- */
-const layerConfigs = [
-  {
-    id: "radarStations",
-    label: "Trạm Ra đa",
-    description: "Vị trí các trạm ra đa thời tiết",
-    icon: SatelliteDish,
-    iconColor: "text-amber-500",
-    defaultVisible: true,
-  },
-  {
-    id: "mergeDistricts",
-    label: "Điểm dự báo",
-    description: "Lớp gộp xã/phường",
-    icon: Map,
-    iconColor: "text-emerald-500",
-    defaultVisible: false,
-  },
-];
+import { dropdownConfigs } from "../../lib/config/dropdownConfigs";
+import { CircleMarker, Popup } from "react-leaflet";
+import ForecastPointLayer from "./ForecastPointLayer";
+import { layerControlConfigs } from "../../lib/constants";
 
-const LayerControl = () => {
+/** Danh sách trạm ra đa từ config */
+const radarStations =
+  dropdownConfigs
+    .find((c) => c.id === "stations")
+    ?.options.filter((opt) => opt.location) || [];
+
+const LayerControlToggle = () => {
   const { layerVisibility, setLayerVisibility } = useSelection();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
   const panelRef = useRef(null);
-  const map = useMap();
 
   // Ngăn lan truyền sự kiện click/scroll xuống bản đồ Leaflet
   useEffect(() => {
@@ -114,21 +100,13 @@ const LayerControl = () => {
 
             {/* Layer items */}
             <div className="space-y-1">
-              {layerConfigs.map((layer) => {
+              {layerControlConfigs.map((layer) => {
                 const isActive = layerVisibility[layer.id];
                 const Icon = layer.icon;
                 return (
                   <button
                     key={layer.id}
-                    onClick={() => {
-                      if (layer.id === "mergeDistricts" && !isActive) {
-                        map.setView(locationPHA, 8, {
-                          animate: true,
-                          duration: 1,
-                        });
-                      }
-                      toggleLayer(layer.id);
-                    }}
+                    onClick={() => toggleLayer(layer.id)}
                     className={`flex w-full items-center gap-2 rounded-lg p-2 transition-all duration-200 sm:gap-3 sm:rounded-xl sm:p-2.5 ${
                       isActive
                         ? "border border-indigo-100 bg-indigo-50/80 dark:border-indigo-500/30 dark:bg-indigo-500/10"
@@ -192,8 +170,38 @@ const LayerControl = () => {
           </div>
         )}
       </div>
+      {/* ===  Weather Ra đa Station Layer(toggle) === */}
+      {layerVisibility.radarStations &&
+        radarStations.map((station) => (
+          <CircleMarker
+            key={station.name}
+            center={station.location}
+            radius={5}
+            pathOptions={{
+              color: "#4f46e5",
+              fillColor: "#818cf8",
+              fillOpacity: 0.9,
+              weight: 1,
+            }}
+            pane="paneRadarStations"
+          >
+            <Popup className="station-popup">
+              <div className="flex flex-col items-center gap-0.5">
+                <span className="text-sm font-bold text-slate-700 dark:text-slate-200">
+                  Trạm Ra đa {station.name}
+                </span>
+                <span className="text-[11px] text-slate-400 dark:text-slate-500">
+                  ({station.location[0].toFixed(2)}°N,{"  "}
+                  {station.location[1].toFixed(2)}°E)
+                </span>
+              </div>
+            </Popup>
+          </CircleMarker>
+        ))}
+      {/* === Merger District Layer (toggle) === */}
+      {layerVisibility.mergeDistricts && <ForecastPointLayer />}
     </div>
   );
 };
 
-export default React.memo(LayerControl);
+export default React.memo(LayerControlToggle);

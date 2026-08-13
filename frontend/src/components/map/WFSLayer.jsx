@@ -1,9 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { GeoJSON } from "react-leaflet";
+import { GeoJSON, useMapEvents } from "react-leaflet";
 import { GEOSERVER_WFS_URL } from "../../lib/constants";
 import { useTheme } from "../../context/ThemeContext";
 import createOnEachFeature from "../../lib/createOnEachFeature";
-import MapTooltipCleaner from "../map/MapTooltipCleaner";
 /**
  * Component to fetch and display GeoServer WFS layers for Provinces and Districts.
  *
@@ -13,9 +12,10 @@ import MapTooltipCleaner from "../map/MapTooltipCleaner";
  * - district layer is fetched and displayed only when current map zoom level > 8.
  *
  */
-const WFSLayer = ({ zoomThreshold = 8, currentZoom }) => {
+const WFSLayer = ({ zoomThreshold = 8, disableBoundaryHover = false }) => {
   const [provinceGeoJson, setProvinceGeoJson] = useState(null);
   const [districtGeoJson, setDistrictGeoJson] = useState(null);
+  const [zoomLevel, setZoomLevel] = useState(7);
   const { isDarkMode } = useTheme();
   const hasFetchedDistrict = useRef(false);
 
@@ -42,6 +42,12 @@ const WFSLayer = ({ zoomThreshold = 8, currentZoom }) => {
     [isDarkMode],
   );
 
+  useMapEvents({
+    zoomend: (e) => {
+      setZoomLevel(e.target.getZoom());
+    },
+  });
+
   // Fetch province WFS layer on component mount
   useEffect(() => {
     let isMounted = true;
@@ -62,7 +68,7 @@ const WFSLayer = ({ zoomThreshold = 8, currentZoom }) => {
   }, []);
   // Lazy fetch district WFS layer only when zoom level first reaches the threshold (> 8)
   useEffect(() => {
-    if (currentZoom <= zoomThreshold || hasFetchedDistrict.current) return;
+    if (zoomLevel <= zoomThreshold || hasFetchedDistrict.current) return;
 
     hasFetchedDistrict.current = true;
     let isMounted = true;
@@ -86,18 +92,20 @@ const WFSLayer = ({ zoomThreshold = 8, currentZoom }) => {
     return () => {
       isMounted = false;
     };
-  }, [currentZoom]);
+  }, [zoomLevel]);
+
+  const boundaryHoverEnabled = !disableBoundaryHover;
 
   return (
     <>
       {/* Province GeoJSON Layer */}
       {provinceGeoJson && (
         <GeoJSON
-          key={`province-wfs-layer-${isDarkMode}-${currentZoom > zoomThreshold}`}
+          key={`province-wfs-layer-${isDarkMode}-${zoomLevel > zoomThreshold}-${boundaryHoverEnabled}`}
           data={provinceGeoJson}
           style={styleLayers.provinceStyle}
           pane="paneBoundaryProvinces"
-          interactive={currentZoom <= zoomThreshold}
+          interactive={boundaryHoverEnabled && zoomLevel <= zoomThreshold}
           onEachFeature={createOnEachFeature(
             false,
             styleLayers.provinceStyle,
@@ -106,12 +114,13 @@ const WFSLayer = ({ zoomThreshold = 8, currentZoom }) => {
         />
       )}
       {/* district GeoJSON Layer (Visible ONLY when zoom level > 8) */}
-      {currentZoom > zoomThreshold && districtGeoJson && (
+      {zoomLevel > zoomThreshold && districtGeoJson && (
         <GeoJSON
-          key={`district-wfs-layer-${isDarkMode}-${hasFetchedDistrict}`}
+          key={`district-wfs-layer-${isDarkMode}-${hasFetchedDistrict.current}-${boundaryHoverEnabled}`}
           data={districtGeoJson}
           style={styleLayers.districtStyle}
           pane="paneDistricts"
+          interactive={boundaryHoverEnabled}
           onEachFeature={createOnEachFeature(
             true,
             styleLayers.districtStyle,
