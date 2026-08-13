@@ -22,9 +22,7 @@ const GetMapInfoHandler = ({ timeline }) => {
       const size = map.getSize();
       const point = map.latLngToContainerPoint(e.latlng);
       const bounds = map.getBounds();
-      const districtsLayer = layerVisibility.mergeDistricts
-        ? "radar:new_merge_districts_2025"
-        : "radar:all_new_districts_2025";
+      const districtsLayer = "radar:all_new_districts_2025";
 
       const productLayer = `radar:${activeProduct.toLowerCase()}_mosaic_index`;
 

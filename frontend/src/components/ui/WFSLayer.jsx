@@ -3,7 +3,6 @@ import { GeoJSON } from "react-leaflet";
 import { GEOSERVER_WFS_URL } from "../../lib/constants";
 import { useTheme } from "../../context/ThemeContext";
 import createOnEachFeature from "../../lib/createOnEachFeature";
-import MapTooltipCleaner from "../map/MapTooltipCleaner";
 /**
  * Component to fetch and display GeoServer WFS layers for Provinces and Districts.
  *
@@ -13,7 +12,11 @@ import MapTooltipCleaner from "../map/MapTooltipCleaner";
  * - district layer is fetched and displayed only when current map zoom level > 8.
  *
  */
-const WFSLayer = ({ zoomThreshold = 8, currentZoom }) => {
+const WFSLayer = ({
+  zoomThreshold = 8,
+  currentZoom,
+  disableBoundaryHover = false,
+}) => {
   const [provinceGeoJson, setProvinceGeoJson] = useState(null);
   const [districtGeoJson, setDistrictGeoJson] = useState(null);
   const { isDarkMode } = useTheme();
@@ -88,16 +91,18 @@ const WFSLayer = ({ zoomThreshold = 8, currentZoom }) => {
     };
   }, [currentZoom]);
 
+  const boundaryHoverEnabled = !disableBoundaryHover;
+
   return (
     <>
       {/* Province GeoJSON Layer */}
       {provinceGeoJson && (
         <GeoJSON
-          key={`province-wfs-layer-${isDarkMode}-${currentZoom > zoomThreshold}`}
+          key={`province-wfs-layer-${isDarkMode}-${currentZoom > zoomThreshold}-${boundaryHoverEnabled}`}
           data={provinceGeoJson}
           style={styleLayers.provinceStyle}
           pane="paneBoundaryProvinces"
-          interactive={currentZoom <= zoomThreshold}
+          interactive={boundaryHoverEnabled && currentZoom <= zoomThreshold}
           onEachFeature={createOnEachFeature(
             false,
             styleLayers.provinceStyle,
@@ -108,10 +113,11 @@ const WFSLayer = ({ zoomThreshold = 8, currentZoom }) => {
       {/* district GeoJSON Layer (Visible ONLY when zoom level > 8) */}
       {currentZoom > zoomThreshold && districtGeoJson && (
         <GeoJSON
-          key={`district-wfs-layer-${isDarkMode}-${hasFetchedDistrict}`}
+          key={`district-wfs-layer-${isDarkMode}-${hasFetchedDistrict.current}-${boundaryHoverEnabled}`}
           data={districtGeoJson}
           style={styleLayers.districtStyle}
           pane="paneDistricts"
+          interactive={boundaryHoverEnabled}
           onEachFeature={createOnEachFeature(
             true,
             styleLayers.districtStyle,

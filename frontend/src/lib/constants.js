@@ -23,3 +23,12 @@ export const boundsNorthVN = L.latLngBounds([17.7, 101.5], [25.2, 108.0]);
 
 // ** location PHA radar
 export const locationPHA = [21.57139, 103.51694];
+
+export const panes = [
+  { name: "paneMaskProvinces", zIndex: 550 },
+  { name: "paneRadarProducts", zIndex: 600 },
+  { name: "paneDistricts", zIndex: 640 },
+  { name: "panePointForecast", zIndex: 650 },
+  { name: "paneBoundaryProvinces", zIndex: 660 },
+  { name: "paneRadarStations", zIndex: 700 },
+];
