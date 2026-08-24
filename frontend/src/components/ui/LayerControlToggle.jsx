@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Layers, ChevronDown, SatelliteDish, Map } from "lucide-react";
+import { Layers, ChevronDown } from "lucide-react";
 import L from "leaflet";
-import { useSelection } from "../../context/SelectionContext";
+import { useLayerToggle } from "../../context/LayerToggleContext";
 import { dropdownConfigs } from "../../lib/config/dropdownConfigs";
 import { CircleMarker, Popup } from "react-leaflet";
-import ForecastPointLayer from "./ForecastPointLayer";
+import ForecastPointLayer from "../map/ForecastPointLayer";
 import { layerControlConfigs } from "../../lib/constants";
 
 /** Danh sách trạm ra đa từ config */
@@ -14,7 +14,7 @@ const radarStations =
     ?.options.filter((opt) => opt.location) || [];
 
 const LayerControlToggle = () => {
-  const { layerVisibility, setLayerVisibility } = useSelection();
+  const { layerVisibility, setLayerVisibility } = useLayerToggle();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
   const panelRef = useRef(null);

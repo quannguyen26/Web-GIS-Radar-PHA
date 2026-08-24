@@ -5,14 +5,11 @@ const SelectionContext = createContext();
 
 export const SelectionProvider = ({ children }) => {
   const [selections, setSelections] = useState(defaultSelections);
-  const [layerVisibility, setLayerVisibility] = useState({
-    radarStations: false,
-    mergeDistricts: false,
-  });
+  
 
   const value = useMemo(
-    () => ({ selections, setSelections, layerVisibility, setLayerVisibility }),
-    [selections, layerVisibility],
+    () => ({ selections, setSelections }),
+    [selections],
   );
 
   return (

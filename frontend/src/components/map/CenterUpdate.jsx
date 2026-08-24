@@ -2,7 +2,11 @@ import { useEffect } from "react";
 import { useMap } from "react-leaflet";
 import { locationPHA } from "../../lib/constants";
 import { dropdownConfigs } from "../../lib/config/dropdownConfigs";
-const CenterUpdater = ({ selectedRegion, setZoomLevel }) => {
+import { useSelection } from "../../context/SelectionContext";
+import React from "react";
+const CenterUpdater = () => {
+  const { selections} = useSelection();
+  const selectedRegion = selections.region.name;
   const map = useMap();
   const selectedCenter = dropdownConfigs[2].options.find(
     (opt) => opt.name === selectedRegion,
@@ -13,7 +17,7 @@ const CenterUpdater = ({ selectedRegion, setZoomLevel }) => {
       map.setMaxZoom(10);
       // Di chuyển mượt mà về Bắc Bộ
       map.setView(locationPHA, 7, { animate: true, duration: 1 });
-      setZoomLevel(7);
+      
     } else if (selectedCenter) {
       map.setMinZoom(1);
       map.setMaxZoom(20);
@@ -22,9 +26,9 @@ const CenterUpdater = ({ selectedRegion, setZoomLevel }) => {
 
       // Lắng nghe sự kiện di chuyển
       const handleMoveEnd = () => {
-        map.setMinZoom(8);
+        map.setMinZoom(9);
         map.setMaxZoom(10);
-        setZoomLevel(8);
+        
       };
 
       map.once("moveend", handleMoveEnd);
@@ -34,7 +38,7 @@ const CenterUpdater = ({ selectedRegion, setZoomLevel }) => {
         map.off("moveend", handleMoveEnd);
       };
     }
-  }, [selectedRegion, selectedCenter, map, setZoomLevel]);
+  }, [selectedRegion, selectedCenter,]);
   return null;
 };
 

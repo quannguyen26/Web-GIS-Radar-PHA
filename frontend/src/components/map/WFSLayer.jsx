@@ -3,6 +3,8 @@ import { GeoJSON, useMapEvents } from "react-leaflet";
 import { GEOSERVER_WFS_URL } from "../../lib/constants";
 import { useTheme } from "../../context/ThemeContext";
 import createOnEachFeature from "../../lib/createOnEachFeature";
+import { useSelection } from "../../context/SelectionContext";
+import { useLayerToggle } from "../../context/LayerToggleContext";
 /**
  * Component to fetch and display GeoServer WFS layers for Provinces and Districts.
  *
@@ -12,13 +14,15 @@ import createOnEachFeature from "../../lib/createOnEachFeature";
  * - district layer is fetched and displayed only when current map zoom level > 8.
  *
  */
-const WFSLayer = ({ zoomThreshold = 8, disableBoundaryHover = false }) => {
+const WFSLayer = ({ zoomThreshold = 8 }) => {
+  const { selections } = useSelection();
+  const { layerVisibility } = useLayerToggle();
   const [provinceGeoJson, setProvinceGeoJson] = useState(null);
   const [districtGeoJson, setDistrictGeoJson] = useState(null);
   const [zoomLevel, setZoomLevel] = useState(7);
   const { isDarkMode } = useTheme();
   const hasFetchedDistrict = useRef(false);
-
+  const selectedRegion = selections.region.name;
   const styleLayers = useMemo(
     () => ({
       provinceStyle: {
@@ -93,8 +97,24 @@ const WFSLayer = ({ zoomThreshold = 8, disableBoundaryHover = false }) => {
       isMounted = false;
     };
   }, [zoomLevel]);
+  
+  const boundaryHoverEnabled = !layerVisibility.mergeDistricts;
 
-  const boundaryHoverEnabled = !disableBoundaryHover;
+  const visibleDistrictGeoJson = useMemo(() => {
+    if (!districtGeoJson || selectedRegion === "Bắc Bộ") {
+      return districtGeoJson;
+    }
+
+    return {
+      ...districtGeoJson,
+      features: districtGeoJson.features.filter((feature) => {
+        const provinceName =
+          feature.properties.tentinh || feature.properties.ten_tinh;
+
+        return provinceName === selectedRegion;
+      }),
+    };
+  }, [districtGeoJson, selectedRegion]);
 
   return (
     <>
@@ -116,8 +136,8 @@ const WFSLayer = ({ zoomThreshold = 8, disableBoundaryHover = false }) => {
       {/* district GeoJSON Layer (Visible ONLY when zoom level > 8) */}
       {zoomLevel > zoomThreshold && districtGeoJson && (
         <GeoJSON
-          key={`district-wfs-layer-${isDarkMode}-${hasFetchedDistrict.current}-${boundaryHoverEnabled}`}
-          data={districtGeoJson}
+          key={`district-wfs-layer-${isDarkMode}-${hasFetchedDistrict.current}-${boundaryHoverEnabled}-${selectedRegion}`}
+          data={visibleDistrictGeoJson}
           style={styleLayers.districtStyle}
           pane="paneDistricts"
           interactive={boundaryHoverEnabled}
@@ -131,4 +151,4 @@ const WFSLayer = ({ zoomThreshold = 8, disableBoundaryHover = false }) => {
     </>
   );
 };
-export default WFSLayer;
+export default React.memo(WFSLayer);

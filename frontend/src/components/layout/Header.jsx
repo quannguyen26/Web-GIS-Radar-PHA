@@ -22,6 +22,7 @@ const Header = ({ isSidebarOpen, setIsSidebarOpen, setIsMobileMenuOpen }) => {
           onClick={() => {
             setIsSidebarOpen(!isSidebarOpen);
           }}
+          title={isSidebarOpen ? "Thu gọn thanh bên" : "Mở rộng thanh bên"}
         >
           <Menu size={22} />
         </button>
@@ -44,11 +45,15 @@ const Header = ({ isSidebarOpen, setIsSidebarOpen, setIsMobileMenuOpen }) => {
         <button
           className="rounded-xl border border-gray-200 bg-gray-100 p-2.5 text-slate-600 transition-all hover:bg-gray-200 dark:border-slate-700 dark:bg-slate-800 dark:text-amber-400 dark:hover:bg-slate-700"
           onClick={() => setIsDarkMode(!isDarkMode)}
+          title={isDarkMode ? "Chế độ sáng" : "Chế độ tối"}
         >
           {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
         </button>
 
-        <button className="relative rounded-xl p-2.5 text-gray-400 transition-all hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-slate-800">
+        <button
+          className="relative rounded-xl p-2.5 text-gray-400 transition-all hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-slate-800"
+          title="Thông báo"
+        >
           <Bell size={20} />
           <span className="absolute top-2.5 right-2.5 h-2 w-2 rounded-full border-2 border-[#1e293b] bg-indigo-500 dark:border-slate-900"></span>
         </button>
