@@ -144,6 +144,7 @@ const AnimationControl = ({ timeline, setTimeline }) => {
                 ? "bg-rose-500 text-white shadow-rose-500/20 hover:bg-rose-600 active:scale-95"
                 : "bg-indigo-600 text-white shadow-indigo-600/10 hover:bg-indigo-700 active:scale-95"
             }`}
+            title={isPlaying ? "Dừng phát" : "Phát tự động"}
           >
             {isPlaying ? (
               <Pause size={18} fill="currentColor" />

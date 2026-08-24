@@ -1,27 +1,21 @@
 import { MapContainer, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import ProductLayer from "./ProductLayer";
-import { useSelection } from "../../context/SelectionContext";
 import { useTheme } from "../../context/ThemeContext";
 import {
   GEOSERVER_WMTS_URL,
   locationPHA,
   boundsNorthVN,
 } from "../../lib/constants";
-import { useState } from "react";
-import ZoomTracker from "./ZoomTracker";
 import CenterUpdater from "./CenterUpdate";
 import WFSLayer from "./WFSLayer";
 import MapTooltipCleaner from "./MapTooltipCleaner";
 import LayerControlToggle from "../ui/LayerControlToggle";
 import MapPanes from "./MapPanes";
+import { LayerToggleProvider } from "../../context/LayerToggleContext";
 
 const MapView = () => {
-  const { selections, layerVisibility } = useSelection();
   const { isDarkMode } = useTheme();
-  // const [zoomLevel, setZoomLevel] = useState(7);
-  // const selectedRegion = selections.region.name;
-
   const themeKey = isDarkMode ? "dark" : "light";
 
   return (
@@ -39,7 +33,6 @@ const MapView = () => {
       zoomControl={false}
       attributionControl={false}
     >
-      {/* <ZoomTracker setZoomLevel={setZoomLevel} /> */}
       <MapTooltipCleaner />
       {/* Map Panes Configs */}
       <MapPanes />
@@ -55,21 +48,21 @@ const MapView = () => {
         key={`${themeKey}-provinces-mask`}
         url={`${GEOSERVER_WMTS_URL}?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&LAYER=radar:all_new_provinces_2025&STYLE=radar:${themeKey}-provinces-mask&TILEMATRIXSET=EPSG:3857&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/png`}
         pane="paneMaskProvinces"
-        transparent={true}
         bounds={[
           [16.188278988000036, 102.14388732800006],
           [23.392738122000026, 108.19501653500004],
         ]}
       />
-      {/* GeoJson district/province Layer */}
-      <WFSLayer disableBoundaryHover={layerVisibility.mergeDistricts} />
-      {/* Layer Control UI */}
-      <LayerControlToggle />
+      {/* Layer Toggle Context Provider */}
+      <LayerToggleProvider>
+        {/* GeoJson district/province Layers */}
+        <WFSLayer />
+        {/* Layer Control UI */}
+        <LayerControlToggle />
+      </LayerToggleProvider>
+      {/* Radar Product Layer */}
       <ProductLayer key="radar-product-layer" />
-      {/* <CenterUpdater
-        selectedRegion={selectedRegion}
-        setZoomLevel={setZoomLevel}
-      /> */}
+      <CenterUpdater />
     </MapContainer>
   );
 };
