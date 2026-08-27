@@ -4,16 +4,14 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useSelection } from "../../context/SelectionContext";
 import { productLegendConfigs } from "../../lib/config/legendConfigs";
-// import { dropdownConfigs } from "../../lib/config/dropdownConfigs";
 import { GEOSERVER_WMS_URL } from "../../lib/constants";
 
 /**
  * Component xử lý lấy thông tin thuộc tính (GetFeatureInfo) khi click vào bản đồ
  */
 const GetMapInfoHandler = ({ timeline }) => {
-  const { selections, layerVisibility } = useSelection();
+  const { selections } = useSelection();
   const activeProduct = selections.products.name;
-  // const activeLayer = selections.region.name;
   const unitProduct = productLegendConfigs[activeProduct]?.unit || "";
   const currentTime = timeline?.list[timeline?.index];
 
@@ -21,10 +19,9 @@ const GetMapInfoHandler = ({ timeline }) => {
     click: async (e) => {
       const size = map.getSize();
       const point = map.latLngToContainerPoint(e.latlng);
+
       const bounds = map.getBounds();
-      const districtsLayer = layerVisibility.mergeDistricts
-        ? "radar:new_merge_districts_2025"
-        : "radar:all_new_districts_2025";
+      const districtsLayer = "radar:all_new_districts_2025";
 
       const productLayer = `radar:${activeProduct.toLowerCase()}_mosaic_index`;
 

@@ -1,41 +1,21 @@
-import {
-  MapContainer,
-  TileLayer,
-  Pane,
-  WMSTileLayer,
-  CircleMarker,
-  Popup,
-} from "react-leaflet";
+import { MapContainer, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import ProductLayer from "./ProductLayer";
-import { useSelection } from "../../context/SelectionContext";
 import { useTheme } from "../../context/ThemeContext";
 import {
-  GEOSERVER_WMS_URL,
   GEOSERVER_WMTS_URL,
   locationPHA,
   boundsNorthVN,
 } from "../../lib/constants";
-import { useState } from "react";
-import ZoomTracker from "./ZoomTracker";
 import CenterUpdater from "./CenterUpdate";
-import LayerControl from "../ui/LayerControl";
-import { dropdownConfigs } from "../../lib/config/dropdownConfigs";
-
-/** Danh sách trạm ra đa từ config */
-const radarStations =
-  dropdownConfigs
-    .find((c) => c.id === "stations")
-    ?.options.filter((opt) => opt.location) || [];
+import WFSLayer from "./WFSLayer";
+import MapTooltipCleaner from "./MapTooltipCleaner";
+import LayerControlToggle from "../ui/LayerControlToggle";
+import MapPanes from "./MapPanes";
+import { LayerToggleProvider } from "../../context/LayerToggleContext";
 
 const MapView = () => {
-  const { selections, layerVisibility, setLayerVisibility } = useSelection();
   const { isDarkMode } = useTheme();
-  // ** mức zoom */
-  const [zoomLevel, setZoomLevel] = useState(7);
-  // ** dd */
-  const selectedRegion = selections.region.name;
-
   const themeKey = isDarkMode ? "dark" : "light";
 
   return (
@@ -53,13 +33,9 @@ const MapView = () => {
       zoomControl={false}
       attributionControl={false}
     >
-      <ZoomTracker setZoomLevel={setZoomLevel} />
-      <Pane name="paneMaskProvinces" style={{ zIndex: 550 }} />
-      <Pane name="paneRadar" style={{ zIndex: 600 }} />
-      <Pane name="paneBoundaryProvinces" style={{ zIndex: 660 }} />
-      <Pane name="paneDistricts" style={{ zIndex: 640 }} />
-      <Pane name="paneStations" style={{ zIndex: 700 }} />
-      <Pane name="paneMergeDistricts" style={{ zIndex: 650 }} />
+      <MapTooltipCleaner />
+      {/* Map Panes Configs */}
+      <MapPanes />
       {/* Base Map Dark/Light Layer */}
       <TileLayer
         key={`layer-base-${themeKey}`}
@@ -67,17 +43,17 @@ const MapView = () => {
           isDarkMode ? "Dark" : "Light"
         }_Gray_Base/MapServer/tile/{z}/{y}/{x}`}
       />{" "}
-      {/* North Viet Nam Provinces Mask Dark/Light Layer */}
+      {/*Viet Nam Provinces Mask Dark/Light Layer */}
       <TileLayer
         key={`${themeKey}-provinces-mask`}
         url={`${GEOSERVER_WMTS_URL}?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&LAYER=radar:all_new_provinces_2025&STYLE=radar:${themeKey}-provinces-mask&TILEMATRIXSET=EPSG:3857&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/png`}
         pane="paneMaskProvinces"
-        transparent={true}
         bounds={[
           [16.188278988000036, 102.14388732800006],
           [23.392738122000026, 108.19501653500004],
         ]}
       />
+<<<<<<< HEAD
       {/* North Viet Nam Provinces Boundary Layer */}
       <TileLayer
         key={`${themeKey}_provinces_style`}
@@ -154,16 +130,18 @@ const MapView = () => {
           transparent={true}
         />
       )}
+=======
+      {/* Layer Toggle Context Provider */}
+      <LayerToggleProvider>
+        {/* GeoJson district/province Layers */}
+        <WFSLayer />
+        {/* Layer Control UI */}
+        <LayerControlToggle />
+      </LayerToggleProvider>
+      {/* Radar Product Layer */}
+>>>>>>> change-layer-json
       <ProductLayer key="radar-product-layer" />
-      <CenterUpdater
-        selectedRegion={selectedRegion}
-        setZoomLevel={setZoomLevel}
-      />
-      {/* Layer Control UI */}
-      <LayerControl
-        layerVisibility={layerVisibility}
-        setLayerVisibility={setLayerVisibility}
-      />
+      <CenterUpdater />
     </MapContainer>
   );
 };
