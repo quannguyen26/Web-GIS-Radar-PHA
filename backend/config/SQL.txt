@@ -14,7 +14,7 @@ BEGIN
   -- Phát tín hiệu NOTIFY tới kênh 'radar_update'
   -- Gửi kèm một chuỗi JSON chứa tên sản phẩm vừa có dữ liệu mới
   PERFORM pg_notify(
-    'radar_update', 
+    'radar_product_update', 
     json_build_object('product', product_name)::text
   );
   

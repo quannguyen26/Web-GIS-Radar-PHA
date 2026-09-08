@@ -1,5 +1,8 @@
 import pool from "../../config/database.js";
 import initPostgresListener from "../../config/initPostgresListener.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 // Quản lý client theo nhóm sản phẩm: { "product_main": [res1, res2], "product_sub_1": [res3] }
 let productGroups = {};
@@ -40,9 +43,9 @@ export const getTimes = async (req, res) => {
   const newClient = { id: clientId, res };
   productGroups[product].push(newClient);
 
-  // // --- TỐI ƯU CỐT LÕI: Gửi ngay 6 mốc lịch sử lập tức khi vừa kết nối thành công ---
+  // // --- TỐI ƯU CỐT LÕI: Gửi ngay 12 mốc lịch sử lập tức khi vừa kết nối thành công ---
   try {
-    const initTimes = await getLatestTimestamps(product, 6);
+    const initTimes = await getLatestTimestamps(product, process.env.LIMIT_PRODUCTS);
 
     res
       .status(200)

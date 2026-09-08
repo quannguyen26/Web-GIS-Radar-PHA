@@ -74,7 +74,7 @@ const AnimationControl = ({ timeline, setTimeline }) => {
   return (
     <div
       ref={containerRef}
-      className="absolute top-3 left-1/2 z-1000 w-[90%] max-w-75 -translate-x-1/2 sm:right-4 sm:left-auto sm:w-62 sm:translate-x-0 md:top-4 md:w-70"
+      className="absolute top-3 left-1/2 z-1001 w-[90%] max-w-75 -translate-x-1/2 sm:right-4 sm:left-auto sm:w-62 sm:translate-x-0 md:top-4 md:w-70"
     >
       <div className="rounded-2xl border border-slate-200 bg-white/90 p-2 shadow-2xl backdrop-blur-md md:rounded-3xl md:p-3 dark:border-slate-700 dark:bg-slate-900/90">
         {/* Dropdown chọn thời gian */}
@@ -95,9 +95,9 @@ const AnimationControl = ({ timeline, setTimeline }) => {
             />
           </button>
 
-          {/* Menu sổ xuống (Custom List) */}
+          {/* Dropdown Menu (Custom List) */}
           {isDropdownOpen && (
-            <div className="animate-in fade-in slide-in-from-top-2 absolute top-full left-0 mt-2 max-h-48 w-full overflow-y-auto rounded-2xl border border-slate-200 bg-white p-1.5 shadow-xl shadow-indigo-500/10 duration-200 md:max-h-60 dark:border-slate-700 dark:bg-slate-900">
+            <div className="animate-in fade-in slide-in-from-top-2 absolute top-full left-0 mt-1 max-h-48 w-full overflow-y-auto rounded-2xl border border-slate-200 bg-white p-1.5 shadow-xl shadow-indigo-500/10 duration-200 md:h-60 dark:border-slate-700 dark:bg-slate-900">
               {timeline.list.map((time, idx) => (
                 <button
                   key={time}
