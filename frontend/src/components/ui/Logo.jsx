@@ -1,6 +1,6 @@
 import React from "react";
 import { X } from "lucide-react";
-import LogoImg from "../../assets/logoImg.png";
+import LogoImg from "../../assets/LogoImg.png";
 
 const Logo = ({ isSidebarOpen, isMobileMenuOpen, setIsMobileMenuOpen }) => {
   return (

@@ -24,8 +24,8 @@ const MapView = () => {
       zoom={7}
       minZoom={7}
       maxZoom={10}
-      zoomSnap={0.5}
-      zoomDelta={0.5}
+      zoomSnap={1}
+      zoomDelta={1}
       wheelPxPerZoomLevel={120}
       maxBounds={boundsNorthVN}
       scrollWheelZoom={true}

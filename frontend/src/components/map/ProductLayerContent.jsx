@@ -22,7 +22,7 @@ const ProductLayerContent = ({ product }) => {
       try {
         const data = JSON.parse(event.data);
 
-        // Trường hợp 1: Nhận dữ liệu khởi tạo (danh sách 6 mốc)
+        // Trường hợp 1: Nhận dữ liệu khởi tạo (danh sách 12 mốc)
         if (data.timestamps) {
           setTimeline({
             list: data.timestamps,
@@ -34,7 +34,7 @@ const ProductLayerContent = ({ product }) => {
           setTimeline((prev) => {
             if (prev.list.includes(data.newTimestamp)) return prev;
 
-            const newList = [...prev.list, data.newTimestamp].slice(-6);
+            const newList = [...prev.list, data.newTimestamp].slice(-12);
             let newIndex = prev.index;
 
             if (prev.index === prev.list.length - 1) {

@@ -60,7 +60,10 @@ const Header = ({ isSidebarOpen, setIsSidebarOpen, setIsMobileMenuOpen }) => {
 
         <div className="mx-1 h-8 w-px bg-gray-200 dark:bg-slate-800"></div>
 
-        <button className="flex items-center gap-2 rounded-xl bg-indigo-600 p-2 text-white shadow-lg shadow-indigo-600/20 transition-all hover:bg-indigo-700 active:scale-95 md:px-4 md:py-2.5 dark:shadow-none">
+        <button
+          className="flex items-center gap-2 rounded-xl bg-indigo-600 p-2 text-white shadow-lg shadow-indigo-600/20 transition-all hover:bg-indigo-700 active:scale-95 md:px-4 md:py-2.5 dark:shadow-none"
+          title="Đăng nhập"
+        >
           <LogIn size={20} className="shrink-0" />
           <span className="hidden text-sm font-bold md:block">Đăng nhập</span>
         </button>

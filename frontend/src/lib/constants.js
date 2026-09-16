@@ -3,8 +3,8 @@ import { SatelliteDish, Map } from "lucide-react";
 /** Base URL của GeoServer */
 export const GEOSERVER_BASE_URL = "https://radarphadin.com.vn/geoserver";
 
-/** Base URL của Backend API */
-export const API_BASE_URL = "http://localhost:5001/api";
+/** Base URL của Backend API (relative path for Nginx reverse proxy or env override) */
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
 
 /** URL WMS của GeoServer (dùng cho GetFeatureInfo) */
 export const GEOSERVER_WMS_URL = `${GEOSERVER_BASE_URL}/radar/wms`;

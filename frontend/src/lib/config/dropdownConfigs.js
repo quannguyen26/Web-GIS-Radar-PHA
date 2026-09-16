@@ -82,8 +82,8 @@ export const dropdownConfigs = [
         name: "Điện Biên",
         status: "active",
         centerLocation: [
-          [20.9, 102.15],
-          [22.55, 103.45],
+          [20.9, 110.15],
+          [22.55, 135.45],
         ],
       },
       {
