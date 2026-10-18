@@ -1,8 +1,7 @@
-import pool from "./database.js";
+import poolGeo from "./dbGeoserver.js";
 
 const initPostgresListener = async (productGroups, getLatestTimestamps) => {
-  
-  const pgClient = await pool.connect();
+  const pgClient = await poolGeo.connect();
   await pgClient.query("LISTEN radar_product_update");
 
   pgClient.on("notification", async (msg) => {
@@ -24,9 +23,7 @@ const initPostgresListener = async (productGroups, getLatestTimestamps) => {
           const newTimestamp = latestTimeArr[0];
           // Chỉ gửi mốc mới này cho các client đang kết nối
           productGroups[targetProduct].forEach((client) => {
-            client.res.write(
-              `data: ${JSON.stringify({ newTimestamp })}\n\n`,
-            );
+            client.res.write(`data: ${JSON.stringify({ newTimestamp })}\n\n`);
           });
         }
       }

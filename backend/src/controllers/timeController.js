@@ -1,5 +1,5 @@
-import pool from "../../config/database.js";
-import initPostgresListener from "../../config/initPostgresListener.js";
+import poolGeo from "../../libs/dbGeoserver.js";
+import initPostgresListener from "../../libs/initPostgresListener.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -13,7 +13,7 @@ const getLatestTimestamps = async (product, limit) => {
   // if (product === "HMAX") tableName = "hmax_mosaic_index";
   //   if (product === "product_sub_2") tableName = "radar_timestamps_sub2";
 
-  const result = await pool.query(
+  const result = await poolGeo.query(
     `SELECT ingestion::text FROM ${tableName} ORDER BY ingestion DESC LIMIT ${limit}`,
   );
   return result.rows.map((row) => {
@@ -45,7 +45,10 @@ export const getTimes = async (req, res) => {
 
   // // --- TỐI ƯU CỐT LÕI: Gửi ngay 12 mốc lịch sử lập tức khi vừa kết nối thành công ---
   try {
-    const initTimes = await getLatestTimestamps(product, process.env.LIMIT_PRODUCTS);
+    const initTimes = await getLatestTimestamps(
+      product,
+      process.env.LIMIT_PRODUCTS,
+    );
 
     res
       .status(200)
