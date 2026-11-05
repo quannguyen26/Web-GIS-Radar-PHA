@@ -1,47 +1,31 @@
 // @ts-nocheck
 import jwt from "jsonwebtoken";
-import poolApp from "../../libs/dbWebApp.js";
-// authorization - xác minh user là ai
+
+// Middleware to verify JWT Access Token
 export const protectedRoute = (req, res, next) => {
   try {
-    // lấy token từ header
+    // Extract Authorization header
     const authHeader = req.headers["authorization"];
-    const token = authHeader && authHeader.split(" ")[1]; // Bearer <token>
+    const token = authHeader && authHeader.split(" ")[1]; // Format: Bearer <token>
 
     if (!token) {
       return res.status(401).json({ message: "Không tìm thấy access token" });
     }
 
-    // xác nhận token hợp lệ
-    jwt.verify(
-      token,
-      process.env.ACCESS_TOKEN_SECRET,
-      async (err, decodedUser) => {
-        if (err) {
-          console.error(err);
+    // Verify token with secret
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decodedUser) => {
+      if (err) {
+        console.error("JWT verification error:", err.message);
+        // Return 401 so the frontend client knows to attempt a token refresh
+        return res
+          .status(401)
+          .json({ message: "Access token hết hạn hoặc không hợp lệ" });
+      }
 
-          return res
-            .status(403)
-            .json({ message: "Access token hết hạn hoặc không đúng" });
-        }
-
-        // tìm user
-        // const result = await poolApp.query(
-        //   "SELECT * FROM users WHERE id = $1",
-        //   [decodedUser.id],
-        // );
-        // const user = result.rows[0];
-
-        // if (!user) {
-        //   return res.status(404).json({ message: "Người dùng không tồn tại." });
-        // }
-
-        // // trả user về trong req
-        // delete user.password_hash;
-        req.user = decodedUser;
-        next();
-      },
-    );
+      // Attach decoded payload to request object
+      req.user = decodedUser;
+      next();
+    });
   } catch (error) {
     console.error("Lỗi khi xác minh JWT trong authMiddleware", error);
     return res.status(500).json({ message: "Lỗi hệ thống" });

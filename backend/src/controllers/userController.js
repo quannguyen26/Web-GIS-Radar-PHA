@@ -1,35 +1,40 @@
 import poolApp from "../../libs/dbWebApp.js";
+
+// Controller to get profile of the currently logged-in user
 export const authMe = async (req, res) => {
   try {
-    const userId = req.user.id; // lấy từ authMiddleware
+    const userId = req.user.id; // Extracted from decoded JWT by authMiddleware
 
     const query = `
-            SELECT
-                u.id,
-                u.username,
+      SELECT
+        u.id,
+        u.username,
+        u.full_name,
+        u.email,
+        u.phone,
 
-                t.id AS title_id,
-                t.name AS title_name,
+        t.id AS title_id,
+        t.name AS title_name,
 
-                r.id AS role_id,
-                r.name AS role_name,
+        r.id AS role_id,
+        r.name AS role_name,
 
-                o.id AS organization_id,
-                o.name AS organization_name
+        o.id AS organization_id,
+        o.name AS organization_name
 
-            FROM users u
+      FROM users u
 
-            LEFT JOIN titles t
-                ON u.title_id = t.id
+      LEFT JOIN titles t
+        ON u.title_id = t.id
 
-            LEFT JOIN roles r
-                ON u.role_id = r.id
+      LEFT JOIN roles r
+        ON u.role_id = r.id
 
-            LEFT JOIN organizations o
-                ON u.organization_id = o.id
+      LEFT JOIN organizations o
+        ON u.organization_id = o.id
 
-            WHERE u.id = $1;
-        `;
+      WHERE u.id = $1;
+    `;
 
     const result = await poolApp.query(query, [userId]);
 

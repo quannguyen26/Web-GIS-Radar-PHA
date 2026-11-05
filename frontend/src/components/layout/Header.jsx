@@ -1,8 +1,15 @@
-import { Menu, Search, Sun, Bell, Moon, LogIn } from "lucide-react";
+import { Menu, Search, Sun, Bell, Moon, LogIn, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useTheme } from "../../context/ThemeContext";
+import { useAuth } from "../../context/AuthContext";
 
 const Header = ({ isSidebarOpen, setIsSidebarOpen, setIsMobileMenuOpen }) => {
   const { isDarkMode, setIsDarkMode } = useTheme();
+  const { user, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const displayName = user?.fullName || user?.username || "Người dùng";
+  const userInitial = displayName.trim().charAt(0).toUpperCase();
 
   return (
     <header className="z-30 flex h-17 shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 transition-colors md:px-6 dark:border-[#4a5361] dark:bg-[#4a5361] dark:backdrop-blur-md">
@@ -60,13 +67,40 @@ const Header = ({ isSidebarOpen, setIsSidebarOpen, setIsMobileMenuOpen }) => {
 
         <div className="mx-1 h-8 w-px bg-gray-200 dark:bg-slate-800"></div>
 
-        <button
-          className="flex items-center gap-2 rounded-xl bg-indigo-600 p-2 text-white shadow-lg shadow-indigo-600/20 transition-all hover:bg-indigo-700 active:scale-95 md:px-4 md:py-2.5 dark:shadow-none"
-          title="Đăng nhập"
-        >
-          <LogIn size={20} className="shrink-0" />
-          <span className="hidden text-sm font-bold md:block">Đăng nhập</span>
-        </button>
+        {/* Authentication Button & User Profile */}
+        {isAuthenticated ? (
+          <div className="flex items-center gap-2">
+            <div
+              className="flex items-center gap-2 rounded-xl bg-slate-100 px-3 py-1.5 dark:bg-slate-800"
+              title={displayName}
+            >
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-600 text-xs font-bold text-white shadow-xs">
+                {userInitial}
+              </div>
+              <span className="hidden max-w-32 truncate text-sm font-semibold text-slate-700 md:block dark:text-slate-200">
+                {displayName}
+              </span>
+            </div>
+
+            <button
+              onClick={() => logout()}
+              className="flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-rose-600 transition-all hover:bg-rose-100 active:scale-95 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-400 dark:hover:bg-rose-900/60"
+              title="Đăng xuất"
+            >
+              <LogOut size={16} className="shrink-0" />
+              <span className="hidden text-xs font-bold md:block">Đăng xuất</span>
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => navigate("/login")}
+            className="flex items-center gap-2 rounded-xl bg-indigo-600 p-2 text-white shadow-lg shadow-indigo-600/20 transition-all hover:bg-indigo-700 active:scale-95 md:px-4 md:py-2.5 dark:shadow-none"
+            title="Đăng nhập"
+          >
+            <LogIn size={20} className="shrink-0" />
+            <span className="hidden text-sm font-bold md:block">Đăng nhập</span>
+          </button>
+        )}
       </div>
     </header>
   );
