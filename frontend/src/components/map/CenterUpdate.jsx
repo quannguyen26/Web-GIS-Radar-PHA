@@ -8,9 +8,9 @@ const CenterUpdater = () => {
   const { selections} = useSelection();
   const selectedRegion = selections.region.name;
   const map = useMap();
-  const selectedCenter = dropdownConfigs[2].options.find(
-    (opt) => opt.name === selectedRegion,
-  ).centerLocation;
+  const selectedCenter = dropdownConfigs
+    .find((config) => config.id === "region")
+    ?.options.find((opt) => opt.name === selectedRegion)?.centerLocation;
   useEffect(() => {
     if (selectedRegion === "Bắc Bộ") {
       map.setMinZoom(7);
@@ -38,7 +38,7 @@ const CenterUpdater = () => {
         map.off("moveend", handleMoveEnd);
       };
     }
-  }, [selectedRegion, selectedCenter,]);
+  }, [map, selectedRegion, selectedCenter]);
   return null;
 };
 

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { WMSTileLayer } from "react-leaflet";
-import L from "leaflet";
 import AnimationControl from "../ui/AnimationControl";
 import ProductLegend from "../ui/ProductLegend";
 import GetMapInfoHandler from "./GetMapInfoHandler";
@@ -11,7 +10,8 @@ import { GEOSERVER_WMSC_URL, API_BASE_URL } from "../../lib/constants";
  * và render WMSTileLayer + các UI control liên quan.
  */
 const ProductLayerContent = ({ product }) => {
-  const [timeline, setTimeline] = useState({ list: [], index: 0 });
+  // `limit` is the max number of timestamps kept, sent by the server on connect
+  const [timeline, setTimeline] = useState({ list: [], index: 0, limit: 12 });
 
   useEffect(() => {
     const eventSource = new EventSource(
@@ -24,17 +24,20 @@ const ProductLayerContent = ({ product }) => {
 
         // Trường hợp 1: Nhận dữ liệu khởi tạo (danh sách 12 mốc)
         if (data.timestamps) {
-          setTimeline({
+          setTimeline((prev) => ({
             list: data.timestamps,
             index: data.timestamps.length - 1,
-          });
+            limit: data.limit || prev.limit,
+          }));
         }
         // Trường hợp 2: Nhận cập nhật mốc thời gian mới duy nhất
         else if (data.newTimestamp) {
           setTimeline((prev) => {
             if (prev.list.includes(data.newTimestamp)) return prev;
 
-            const newList = [...prev.list, data.newTimestamp].slice(-12);
+            const newList = [...prev.list, data.newTimestamp].slice(
+              -prev.limit,
+            );
             let newIndex = prev.index;
 
             if (prev.index === prev.list.length - 1) {
@@ -43,7 +46,7 @@ const ProductLayerContent = ({ product }) => {
               newIndex = Math.max(0, prev.index - 1);
             }
 
-            return { list: newList, index: newIndex };
+            return { ...prev, list: newList, index: newIndex };
           });
         }
       } catch (err) {
@@ -51,9 +54,10 @@ const ProductLayerContent = ({ product }) => {
       }
     };
 
-    eventSource.onerror = (err) => {
-      console.error("Lỗi kết nối SSE:", err);
-      eventSource.close();
+    // Do not close on error: EventSource reconnects automatically and the
+    // server resends the full timestamp list on each new connection.
+    eventSource.onerror = () => {
+      console.warn("SSE connection lost, reconnecting...");
     };
 
     return () => {
@@ -70,14 +74,14 @@ const ProductLayerContent = ({ product }) => {
           key={`${product}-${time}`}
           url={GEOSERVER_WMSC_URL}
           opacity={idx === timeline.index ? 1 : 0}
+          // pane is a Leaflet layer option, not a WMS request parameter
+          pane="paneRadarProducts"
           params={{
             layers: `radar:${product.toLowerCase()}_mosaic_index`,
             format: "image/png",
             transparent: true,
             version: "1.1.1",
             time: time,
-            pane: "paneRadarProducts",
-            crs: L.CRS.EPSG3857,
           }}
         />
       ))}

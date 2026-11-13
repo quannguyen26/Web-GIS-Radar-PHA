@@ -1,20 +1,40 @@
+import crypto from "crypto";
 import poolGeo from "../../libs/dbGeoserver.js";
 import initPostgresListener from "../../libs/initPostgresListener.js";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-// Quản lý client theo nhóm sản phẩm: { "product_main": [res1, res2], "product_sub_1": [res3] }
-let productGroups = {};
+// Whitelist of radar products -> mosaic index tables.
+// Table names are never built from user input (prevents SQL injection).
+export const PRODUCT_TABLES = {
+  MAX: "max_mosaic_index",
+  HMAX: "hmax_mosaic_index",
+};
 
-// Hàm bổ trợ lấy nhanh limit mốc thời gian dựa theo tên sản phẩm
+const DEFAULT_LIMIT = 12;
+const MAX_LIMIT = 50;
+const HEARTBEAT_INTERVAL_MS = 25_000;
+
+// Number of timestamps sent on connect, read once from env and clamped to [1, MAX_LIMIT]
+const parsedLimit = Number.parseInt(process.env.LIMIT_PRODUCTS, 10);
+const TIMESTAMP_LIMIT = Number.isFinite(parsedLimit)
+  ? Math.min(Math.max(parsedLimit, 1), MAX_LIMIT)
+  : DEFAULT_LIMIT;
+
+// SSE clients grouped by product: { MAX: [{ id, res }], HMAX: [...] }
+const productGroups = {};
+
+// Return the latest `limit` ingestion timestamps (ascending order is applied by the caller)
 const getLatestTimestamps = async (product, limit) => {
-  let tableName = `${product.toLowerCase()}_mosaic_index`;
-  // if (product === "HMAX") tableName = "hmax_mosaic_index";
-  //   if (product === "product_sub_2") tableName = "radar_timestamps_sub2";
+  const tableName = PRODUCT_TABLES[product];
+  if (!tableName) {
+    throw new Error(`Unknown product: ${product}`);
+  }
 
   const result = await poolGeo.query(
-    `SELECT ingestion::text FROM ${tableName} ORDER BY ingestion DESC LIMIT ${limit}`,
+    `SELECT ingestion::text FROM ${tableName} ORDER BY ingestion DESC LIMIT $1`,
+    [limit],
   );
   return result.rows.map((row) => {
     const rawDate = row.ingestion.substring(0, 19);
@@ -22,58 +42,62 @@ const getLatestTimestamps = async (product, limit) => {
   });
 };
 
-// SSE Động
-// mõi lầ ngọi api getime là 1 bản chạy độc lập (clientId được nhớ)
+// SSE endpoint: GET /api/time?product=MAX
+// Sends the latest timestamps on connect, then pushes new ones via the Postgres listener.
 export const getTimes = async (req, res) => {
-  const { product } = req.query; // Lấy loại sản phẩm từ Frontend gửi lên
+  const { product } = req.query;
 
-  if (!product) {
-    return res.status(400).json({ error: "Thiếu tham số product" });
+  if (typeof product !== "string" || !PRODUCT_TABLES[product]) {
+    return res.status(400).json({ message: "Tham số product không hợp lệ" });
   }
 
-  res.setHeader("Content-Type", "text/event-stream");
-  res.setHeader("Cache-Control", "no-cache");
-  res.setHeader("Connection", "keep-alive");
-  // //   res.setHeader("Access-Control-Allow-Origin", "*");
+  res.writeHead(200, {
+    "Content-Type": "text/event-stream",
+    "Cache-Control": "no-cache",
+    Connection: "keep-alive",
+  });
+  res.flushHeaders();
 
-  // Khởi tạo nhóm nếu nhóm sản phẩm này chưa có ai xem
-  if (!productGroups[product]) productGroups[product] = [];
-
-  const clientId = Date.now();
-  const newClient = { id: clientId, res };
-  productGroups[product].push(newClient);
-
-  // // --- TỐI ƯU CỐT LÕI: Gửi ngay 12 mốc lịch sử lập tức khi vừa kết nối thành công ---
+  // Send the initial timestamps before registering the client, so a new
+  // timestamp can never be pushed ahead of the initial list.
   try {
-    const initTimes = await getLatestTimestamps(
-      product,
-      process.env.LIMIT_PRODUCTS,
+    const initTimes = await getLatestTimestamps(product, TIMESTAMP_LIMIT);
+    res.write(
+      `data: ${JSON.stringify({
+        timestamps: initTimes.reverse(),
+        limit: TIMESTAMP_LIMIT,
+      })}\n\n`,
     );
-
-    res
-      .status(200)
-      .write(
-        `data: ${JSON.stringify({ timestamps: initTimes.reverse() })}\n\n`,
-      );
   } catch (err) {
-    console.error("Lỗi lấy dữ liệu ban đầu:", err);
+    console.error("Failed to load initial timestamps:", err);
+    // End the stream so the browser's EventSource retries the connection
+    return res.end();
   }
 
-  // Xử lý hủy kết nối khi đổi sản phẩm hoặc đóng tab
+  // The client may have disconnected while the query was running
+  if (res.writableEnded || req.socket.destroyed) return;
+
+  const clientId = crypto.randomUUID();
+  if (!productGroups[product]) productGroups[product] = [];
+  productGroups[product].push({ id: clientId, res });
+
+  // Comment lines keep the connection alive through proxies
+  const heartbeat = setInterval(() => {
+    if (!res.writableEnded) res.write(": ping\n\n");
+  }, HEARTBEAT_INTERVAL_MS);
+
   req.on("close", () => {
-    console.log(
-      `🔴 [TEST]: Kết nối có ID ${clientId} đã bị ngắt! Đang dọn dẹp...`,
-    );
-    productGroups[product] = productGroups[product].filter(
+    clearInterval(heartbeat);
+    const remaining = (productGroups[product] || []).filter(
       (c) => c.id !== clientId,
     );
-    console.log(
-      `📊 Danh sách nhóm [${product}] hiện tại còn:`,
-      productGroups[product].length,
-      "Người",
-    );
+    if (remaining.length > 0) {
+      productGroups[product] = remaining;
+    } else {
+      delete productGroups[product];
+    }
   });
 };
 
-// LẮNG NGHE POSTGRESQL VÀ ĐIỀU PHỐI ĐÚNG NHÓM
-initPostgresListener(productGroups, getLatestTimestamps);
+// Listen to Postgres notifications and dispatch to the matching product group
+initPostgresListener(productGroups, getLatestTimestamps, PRODUCT_TABLES);

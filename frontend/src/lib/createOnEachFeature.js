@@ -1,20 +1,23 @@
-import L from "leaflet";
+import escapeHtml from "./escapeHtml";
+
+// Build the tooltip HTML for a feature. Property values come from GeoServer,
+// so they are escaped; only the <br> added here is trusted markup.
 const getFeatureDisplayName = (feature, isDistrict = false) => {
   if (!feature || !feature.properties) return "Không có tên";
   const p = feature.properties;
   if (isDistrict) {
     const districtName = p.tenxa || p.xa_gop || p.ten_xa;
-    const districtType = p.loaixa ? `${p.loaixa} ` : "";
-    const provinceName = p.tentinh || p.ten_tinh || "";
+    const districtType = p.loaixa ? `${escapeHtml(p.loaixa)} ` : "";
+    const provinceName = escapeHtml(p.tentinh || p.ten_tinh || "");
     if (districtName) {
       return provinceName
-        ? `${districtType}${districtName}<br>(${provinceName})`
-        : `${districtType}${districtName}`;
+        ? `${districtType}${escapeHtml(districtName)}<br>(${provinceName})`
+        : `${districtType}${escapeHtml(districtName)}`;
     }
   }
 
-  const typeProvince = p.captinh || p.cap_tinh || loaitinh || "";
-  const nameProvince = p.tentinh || p.ten_tinh || "";
+  const typeProvince = escapeHtml(p.captinh || p.cap_tinh || p.loaitinh || "");
+  const nameProvince = escapeHtml(p.tentinh || p.ten_tinh || "");
   if (typeProvince && nameProvince) {
     return `${typeProvince} ${nameProvince}`.trim();
   }

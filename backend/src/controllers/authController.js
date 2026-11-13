@@ -18,6 +18,55 @@ const getCookieOptions = () => {
   };
 };
 
+const USERNAME_PATTERN = /^[A-Za-z0-9._-]{3,50}$/;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MIN_PASSWORD_LENGTH = 8;
+const MAX_PASSWORD_LENGTH = 72; // bcrypt ignores bytes beyond 72
+
+const isPositiveInteger = (value) => {
+  const n = Number(value);
+  return Number.isInteger(n) && n > 0;
+};
+
+// Return a user-facing error message, or null when the input is valid
+const validateSignUpInput = ({
+  username,
+  password,
+  fullname,
+  email,
+  phone,
+  title,
+  role,
+  organization,
+}) => {
+  if (typeof username !== "string" || !USERNAME_PATTERN.test(username)) {
+    return "username phải dài 3–50 ký tự, chỉ gồm chữ, số và . _ -";
+  }
+  if (
+    typeof password !== "string" ||
+    password.length < MIN_PASSWORD_LENGTH ||
+    password.length > MAX_PASSWORD_LENGTH
+  ) {
+    return `password phải dài từ ${MIN_PASSWORD_LENGTH} đến ${MAX_PASSWORD_LENGTH} ký tự`;
+  }
+  if (typeof fullname !== "string" || fullname.trim().length > 255) {
+    return "fullName không hợp lệ";
+  }
+  if (email && (typeof email !== "string" || !EMAIL_PATTERN.test(email))) {
+    return "email không hợp lệ";
+  }
+  if (phone && (typeof phone !== "string" || phone.length > 20)) {
+    return "phone không hợp lệ";
+  }
+  if (![title, role, organization].every(isPositiveInteger)) {
+    return "title, role và organization phải là ID hợp lệ";
+  }
+  return null;
+};
+
+// Generate an opaque random refresh token
+const generateRefreshToken = () => crypto.randomBytes(64).toString("hex");
+
 export const signUp = async (req, res) => {
   try {
     const {
@@ -43,6 +92,20 @@ export const signUp = async (req, res) => {
         message:
           "Không thể thiếu username, password, fullName, title, role và organization",
       });
+    }
+
+    const validationError = validateSignUpInput({
+      username,
+      password,
+      fullname,
+      email,
+      phone,
+      title,
+      role,
+      organization,
+    });
+    if (validationError) {
+      return res.status(400).json({ message: validationError });
     }
 
     // Check if username already exists
@@ -130,7 +193,13 @@ export const signIn = async (req, res) => {
     );
 
     // Generate refresh token
-    const refreshToken = crypto.randomBytes(64).toString("hex");
+    const refreshToken = generateRefreshToken();
+
+    // Clean up this user's expired sessions
+    await poolApp.query(
+      "DELETE FROM sessions WHERE user_id = $1 AND expires_at < NOW()",
+      [user.id],
+    );
 
     // Insert new session for refresh token
     const insertQuery = `
@@ -228,6 +297,26 @@ export const refreshToken = async (req, res) => {
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: ACCESS_TOKEN_TTL },
     );
+
+    // Rotate the refresh token: the old one becomes invalid immediately.
+    // expires_at is kept so a session cannot be extended forever.
+    const newRefreshToken = generateRefreshToken();
+    const rotated = await poolApp.query(
+      "UPDATE sessions SET refresh_token = $1 WHERE id = $2 AND refresh_token = $3",
+      [newRefreshToken, session.session_id, token],
+    );
+    if (rotated.rowCount === 0) {
+      // Another request rotated this token concurrently
+      return res
+        .status(403)
+        .json({ message: "Token không hợp lệ hoặc không tồn tại" });
+    }
+
+    const remainingMs = new Date(session.expires_at).getTime() - Date.now();
+    res.cookie("refreshToken", newRefreshToken, {
+      ...getCookieOptions(),
+      maxAge: remainingMs,
+    });
 
     // Return only the access token according to RESTful & JWT standards
     return res.status(200).json({ accessToken });

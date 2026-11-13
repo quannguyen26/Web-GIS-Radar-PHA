@@ -11,7 +11,7 @@ BEGIN
   -- Lấy tên sản phẩm được truyền từ tham số của Trigger (TG_ARGV[0])
   product_name := TG_ARGV[0];
 
-  -- Phát tín hiệu NOTIFY tới kênh 'radar_update'
+  -- Phát tín hiệu NOTIFY tới kênh 'radar_product_update'
   -- Gửi kèm một chuỗi JSON chứa tên sản phẩm vừa có dữ liệu mới
   PERFORM pg_notify(
     'radar_product_update', 

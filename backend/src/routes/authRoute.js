@@ -5,10 +5,13 @@ import {
   signOut,
   signUp,
 } from "../controllers/authController.js";
+import { protectedRoute } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.post("/signup", signUp);
+// Self-registration is disabled: only logged-in users can create accounts.
+// TODO: restrict to admin roles once the permission model is defined.
+router.post("/signup", protectedRoute, signUp);
 
 router.post("/signin", signIn);
 

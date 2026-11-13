@@ -93,6 +93,12 @@
   color: #e2e8f0 !important;
 }
 
+/* Hide boundary tooltips while the map is being dragged or zoomed */
+.leaflet-dragging .wfs-feature-tooltip,
+.leaflet-zoom-anim .wfs-feature-tooltip {
+  display: none;
+}
+
 /* Tooltip for WFS Admin Boundaries (Provinces/Districts) */
 .wfs-feature-tooltip {
   text-align: center;

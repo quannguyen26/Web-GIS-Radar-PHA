@@ -13,13 +13,18 @@ const closeTooltips = (layer) => {
 };
 
 const MapTooltipCleaner = () => {
+  // Tooltips can be re-opened by mouseover while the map moves under a
+  // stationary cursor, so also close them when the move/zoom ends.
+  const handleClose = (event) => {
+    event.target.eachLayer(closeTooltips);
+  };
+
   useMapEvents({
-    movestart: (event) => {
-      event.target.eachLayer(closeTooltips);
-    },
-    zoomstart: (event) => {
-      event.target.eachLayer(closeTooltips);
-    },
+    dragstart: handleClose,
+    movestart: handleClose,
+    moveend: handleClose,
+    zoomstart: handleClose,
+    zoomend: handleClose,
   });
 
   return null;

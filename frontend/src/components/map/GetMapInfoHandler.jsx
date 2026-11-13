@@ -1,10 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useSelection } from "../../context/SelectionContext";
 import { productLegendConfigs } from "../../lib/config/legendConfigs";
 import { GEOSERVER_WMS_URL } from "../../lib/constants";
+import escapeHtml from "../../lib/escapeHtml";
 
 /**
  * Component xử lý lấy thông tin thuộc tính (GetFeatureInfo) khi click vào bản đồ
@@ -14,6 +15,8 @@ const GetMapInfoHandler = ({ timeline }) => {
   const activeProduct = selections.products.name;
   const unitProduct = productLegendConfigs[activeProduct]?.unit || "";
   const currentTime = timeline?.list[timeline?.index];
+  // In-flight GetFeatureInfo request, aborted when a newer click happens
+  const abortRef = useRef(null);
 
   const map = useMapEvents({
     click: async (e) => {
@@ -55,8 +58,12 @@ const GetMapInfoHandler = ({ timeline }) => {
 
       const url = `${GEOSERVER_WMS_URL}?${new URLSearchParams(params).toString()}`;
 
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+
       try {
-        const response = await fetch(url);
+        const response = await fetch(url, { signal: controller.signal });
         const data = await response.json();
 
         if (data.features && data.features.length > 0) {
@@ -73,13 +80,14 @@ const GetMapInfoHandler = ({ timeline }) => {
           );
 
           if (adminFeature) {
+            // GeoServer values are escaped before being inserted into HTML
             const p = adminFeature.properties;
-            const adminName = p.tenxa
-              ? `${p.loaixa || ""} ${p.tenxa}`
-              : `${p.loaixa || ""} ${p.xa_gop}`;
+            const adminName = escapeHtml(
+              `${p.loaixa || ""} ${p.tenxa || p.xa_gop}`,
+            );
             const provincePart =
               p.tenxa || p.xa_gop
-                ? `<div class="text-[11px] text-slate-500 dark:text-slate-400 italic">(${p.tentinh})</div>`
+                ? `<div class="text-[11px] text-slate-500 dark:text-slate-400 italic">(${escapeHtml(p.tentinh)})</div>`
                 : "";
 
             content += `
@@ -100,7 +108,7 @@ const GetMapInfoHandler = ({ timeline }) => {
             content += `
               <div class="mt-1 flex justify-center items-baseline gap-1">
                 <span class="text-[15px] font-black text-indigo-700">${formattedValue}</span>
-                <span class="text-[13px] font-bold text-slate-400 dark:text-slate-500 tracking-tight">${unitProduct}</span>
+                <span class="text-[13px] font-bold text-slate-400 dark:text-slate-500 tracking-tight">${escapeHtml(unitProduct)}</span>
               </div>
             `;
           }
@@ -118,6 +126,8 @@ const GetMapInfoHandler = ({ timeline }) => {
           }
         }
       } catch (err) {
+        // A newer click aborted this request: not an error
+        if (err.name === "AbortError") return;
         console.error("Lỗi khi lấy thông tin GetFeatureInfo:", err);
       }
     },
@@ -128,6 +138,7 @@ const GetMapInfoHandler = ({ timeline }) => {
     map.closePopup();
     // Cleanup: Đảm bảo popup được đóng khi component bị unmount (ví dụ khi đổi sản phẩm)
     return () => {
+      abortRef.current?.abort();
       map.closePopup();
     };
   }, [map, activeProduct, currentTime]);

@@ -77,7 +77,7 @@ const Login = () => {
               <img
                 src={LogoImg}
                 alt="Logo"
-                className="h-20 w-20 object-contain drop-shadow"
+                className="h-26 w-26 object-contain drop-shadow"
               />
             </div>
             <h1 className="bg-linear-to-r from-indigo-600 to-purple-600 bg-clip-text text-2xl font-black tracking-tight text-transparent">
