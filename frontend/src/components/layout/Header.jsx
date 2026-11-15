@@ -9,6 +9,7 @@ import {
   Settings,
   Sun,
   User,
+  X,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../../context/ThemeContext";
@@ -20,6 +21,7 @@ const Header = ({ isSidebarOpen, setIsSidebarOpen, setIsMobileMenuOpen }) => {
   const navigate = useNavigate();
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const dropdownRef = useRef(null);
   const timeoutRef = useRef(null);
 
@@ -72,6 +74,24 @@ const Header = ({ isSidebarOpen, setIsSidebarOpen, setIsMobileMenuOpen }) => {
     };
   }, []);
 
+  // Hover opens the menu only for a real mouse; touch/keyboard use click toggle.
+  // Otherwise a tap fires mouseenter (open) then click (toggle -> close).
+  const handlePointerEnter = (event) => {
+    if (event.pointerType === "mouse") openDropdown();
+  };
+
+  const handlePointerLeave = (event) => {
+    if (event.pointerType === "mouse") closeDropdownWithDelay();
+  };
+
+  const handleAvatarClick = (event) => {
+    if (event.nativeEvent.pointerType === "mouse") {
+      openDropdown();
+    } else {
+      setIsDropdownOpen((previous) => !previous);
+    }
+  };
+
   const displayName = user?.fullName || user?.username || "Người dùng";
   const userInitial = (user?.username || displayName)
     .trim()
@@ -82,7 +102,28 @@ const Header = ({ isSidebarOpen, setIsSidebarOpen, setIsMobileMenuOpen }) => {
 
   return (
     <header className="relative z-40 flex h-17 shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 transition-colors md:px-6 dark:border-[#4a5361] dark:bg-[#4a5361] dark:backdrop-blur-md">
-      <div className="flex items-center gap-4">
+      {isMobileSearchOpen && (
+        <div className="absolute inset-0 z-10 flex items-center gap-2 bg-white px-4 sm:hidden dark:bg-[#4a5361]">
+          <Search size={16} className="shrink-0 text-slate-500" />
+          <input
+            type="search"
+            autoFocus
+            placeholder="Tìm kiếm..."
+            aria-label="Tìm kiếm"
+            className="min-w-0 flex-1 rounded-xl bg-gray-100 px-3 py-2 text-sm outline-none dark:bg-slate-800/50 dark:text-slate-200"
+          />
+          <button
+            type="button"
+            className="shrink-0 rounded-lg p-2 text-slate-400 hover:bg-slate-400/10"
+            onClick={() => setIsMobileSearchOpen(false)}
+            aria-label="Đóng tìm kiếm"
+          >
+            <X size={20} />
+          </button>
+        </div>
+      )}
+
+      <div className="mr-3 flex min-w-0 flex-1 items-center gap-4">
         <button
           type="button"
           className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-400/10 md:hidden"
@@ -102,7 +143,7 @@ const Header = ({ isSidebarOpen, setIsSidebarOpen, setIsMobileMenuOpen }) => {
           <Menu size={22} />
         </button>
 
-        <div className="relative hidden w-64 items-center sm:flex md:w-70">
+        <div className="relative hidden w-full max-w-64 min-w-0 items-center sm:flex md:max-w-70">
           <Search
             className="absolute left-3 cursor-pointer text-slate-500"
             size={16}
@@ -116,7 +157,17 @@ const Header = ({ isSidebarOpen, setIsSidebarOpen, setIsMobileMenuOpen }) => {
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex shrink-0 items-center gap-3">
+        <button
+          type="button"
+          className="rounded-xl p-2.5 text-gray-400 transition-all hover:bg-gray-100 sm:hidden dark:text-slate-400 dark:hover:bg-slate-800"
+          onClick={() => setIsMobileSearchOpen(true)}
+          title="Tìm kiếm"
+          aria-label="Mở tìm kiếm"
+        >
+          <Search size={20} />
+        </button>
+
         <button
           type="button"
           className="rounded-xl border border-gray-200 bg-gray-100 p-2.5 text-slate-600 transition-all hover:bg-gray-200 dark:border-slate-700 dark:bg-slate-800 dark:text-amber-400 dark:hover:bg-slate-700"
@@ -136,7 +187,7 @@ const Header = ({ isSidebarOpen, setIsSidebarOpen, setIsMobileMenuOpen }) => {
           aria-label="Thông báo"
         >
           <Bell size={20} />
-          <span className="absolute top-2.5 right-2.5 h-2 w-2 rounded-full border-2 border-[#1e293b] bg-indigo-500 dark:border-slate-900"></span>
+          <span className="absolute top-2.5 right-2.5 h-2 w-2 rounded-full border-2 border-white bg-indigo-500 dark:border-[#4a5361]"></span>
         </button>
 
         <div className="mx-1 h-8 w-px bg-gray-200 dark:bg-slate-800" />
@@ -150,13 +201,12 @@ const Header = ({ isSidebarOpen, setIsSidebarOpen, setIsMobileMenuOpen }) => {
           <div
             ref={dropdownRef}
             className="relative py-1"
-            onMouseEnter={openDropdown}
-            onMouseLeave={closeDropdownWithDelay}
-            onFocus={openDropdown}
+            onPointerEnter={handlePointerEnter}
+            onPointerLeave={handlePointerLeave}
           >
             <button
               type="button"
-              onClick={() => setIsDropdownOpen((previous) => !previous)}
+              onClick={handleAvatarClick}
               className="relative flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl bg-linear-to-tr from-indigo-600 to-indigo-500 font-bold text-white shadow-md ring-2 shadow-indigo-600/20 ring-transparent transition-all duration-200 hover:scale-105 hover:ring-indigo-300 focus:outline-none dark:hover:ring-indigo-400/50"
               title={displayName}
               aria-label="Tài khoản người dùng"
@@ -172,7 +222,7 @@ const Header = ({ isSidebarOpen, setIsSidebarOpen, setIsMobileMenuOpen }) => {
               id="user-menu"
               role="menu"
               aria-hidden={!isDropdownOpen}
-              className={`absolute top-full right-0 z-50 w-72 pt-2 transition-all duration-200 ease-out ${
+              className={`absolute top-full right-0 z-50 w-72 max-w-[calc(100vw-2rem)] pt-2 transition-all duration-200 ease-out ${
                 isDropdownOpen
                   ? "pointer-events-auto visible translate-y-0 opacity-100"
                   : "pointer-events-none invisible translate-y-2 opacity-0"

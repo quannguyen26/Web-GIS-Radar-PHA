@@ -16,7 +16,9 @@ const Logo = ({ isSidebarOpen, isMobileMenuOpen, setIsMobileMenuOpen }) => {
       </h1>
 
       <button
-        className="text-slate-400 transition-colors hover:text-gray-900 md:hidden dark:hover:text-white"
+        type="button"
+        aria-label="Đóng menu"
+        className="p-1 text-slate-400 transition-colors hover:text-gray-900 md:hidden dark:hover:text-white"
         onClick={() => setIsMobileMenuOpen(false)}
       >
         <X size={22} />

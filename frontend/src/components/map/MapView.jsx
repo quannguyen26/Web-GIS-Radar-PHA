@@ -10,6 +10,7 @@ import {
 import CenterUpdater from "./CenterUpdate";
 import WFSLayer from "./WFSLayer";
 import MapTooltipCleaner from "./MapTooltipCleaner";
+import MapResizeHandler from "./MapResizeHandler";
 import LayerControlToggle from "../ui/LayerControlToggle";
 import MapPanes from "./MapPanes";
 import { LayerToggleProvider } from "../../context/LayerToggleContext";
@@ -34,6 +35,7 @@ const MapView = () => {
       attributionControl={false}
     >
       <MapTooltipCleaner />
+      <MapResizeHandler />
       {/* Map Panes Configs */}
       <MapPanes />
       {/* Base Map Dark/Light Layer */}

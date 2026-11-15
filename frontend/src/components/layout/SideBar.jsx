@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { LogIn, LogOut, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Navigation from "../ui/Navigation";
@@ -9,7 +9,33 @@ const SideBar = ({ isSidebarOpen, isMobileMenuOpen, setIsMobileMenuOpen }) => {
   const { user, isLoading, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
 
+  // Close the drawer when the viewport grows past the mobile breakpoint
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(min-width: 768px)");
+    const handleChange = (event) => {
+      if (event.matches) setIsMobileMenuOpen(false);
+    };
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, [setIsMobileMenuOpen]);
+
+  // Escape closes the drawer and body scroll is locked while it is open
+  useEffect(() => {
+    if (!isMobileMenuOpen) return undefined;
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") setIsMobileMenuOpen(false);
+    };
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isMobileMenuOpen, setIsMobileMenuOpen]);
+
   const handleAuthAction = () => {
+    setIsMobileMenuOpen(false);
     if (isAuthenticated) {
       logout();
     } else {
@@ -31,16 +57,18 @@ const SideBar = ({ isSidebarOpen, isMobileMenuOpen, setIsMobileMenuOpen }) => {
         <div
           className="animate-in fade-in fixed inset-0 z-45 bg-black/60 backdrop-blur-sm transition-opacity duration-300 md:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
+          aria-hidden="true"
         />
       )}
 
       <aside
-        className={`z-50 flex flex-col border-r border-gray-200 bg-white shadow-xl transition-all duration-500 ease-in-out dark:border-slate-800 dark:bg-[#1e293b] ${
-          isSidebarOpen ? "w-64" : "w-21"
+        aria-label="Thanh bên"
+        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-gray-200 bg-white shadow-xl transition-all duration-300 ease-in-out md:relative md:translate-x-0 dark:border-slate-800 dark:bg-[#1e293b] ${
+          isSidebarOpen ? "md:w-64" : "md:w-21"
         } ${
           isMobileMenuOpen
-            ? "fixed inset-y-0 left-0 w-64 translate-x-0 shadow-2xl"
-            : "relative hidden translate-x-0 md:flex"
+            ? "translate-x-0 shadow-2xl"
+            : "max-md:invisible max-md:-translate-x-full"
         }`}
       >
         {/* Logo */}

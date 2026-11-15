@@ -6,7 +6,9 @@ import { ThemeProvider } from "../context/ThemeContext";
 import MainContent from "../components/layout/MainContent";
 
 const DashBoard = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(
+    () => window.innerWidth >= 1024,
+  );
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
