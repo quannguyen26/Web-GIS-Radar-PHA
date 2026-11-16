@@ -1,8 +1,15 @@
+import L from "leaflet";
 import { useMapEvents } from "react-leaflet";
 /**
  * Component to close all ToolTip when move or zoom map.
  */
 const closeTooltips = (layer) => {
+  // Standalone tooltips opened on the map (see createOnEachFeature)
+  if (layer instanceof L.Tooltip) {
+    layer.close();
+    return;
+  }
+
   if (typeof layer.closeTooltip === "function") {
     layer.closeTooltip();
   }

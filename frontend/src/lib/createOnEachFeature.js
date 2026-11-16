@@ -1,3 +1,4 @@
+import L from "leaflet";
 import escapeHtml from "./escapeHtml";
 
 // Build the tooltip HTML for a feature. Property values come from GeoServer,
@@ -23,37 +24,58 @@ const getFeatureDisplayName = (feature, isDistrict = false) => {
   }
   return nameProvince || "Đơn vị hành chính";
 };
-// Event handler for each feature (Hover highlight and Tooltip binding)
+
+// True when the primary input cannot hover (phones, tablets). On these devices
+// Leaflet opens tooltips on tap and never receives mouseout, so the tooltip and
+// hover style get stuck and overlap the GetFeatureInfo popup.
+const isHoverlessDevice = () =>
+  typeof window !== "undefined" &&
+  typeof window.matchMedia === "function" &&
+  window.matchMedia("(hover: none)").matches;
+
+// Event handler for each feature (hover highlight + tooltip).
+// The tooltip is managed manually instead of using layer.bindTooltip():
+// Leaflet's bound tooltip queues a re-open on 'moveend' for every feature the
+// cursor crosses while the map is dragged, which leaves several stale tooltips
+// stuck on the map after the drag ends.
 const createOnEachFeature = (
   isDistrictLayer = false,
   baseStyle = {},
   hoverStyle,
 ) => {
   return (feature, layer) => {
-    const name = getFeatureDisplayName(feature, isDistrictLayer);
-    // Bind interactive tooltip on hover. Styling is managed in index.css (.wfs-feature-tooltip) to support dark mode and override Leaflet defaults.
-    layer.bindTooltip(name, {
-      permanent: false,
+    // Touch devices: skip tooltip and hover style, the click popup
+    // (GetMapInfoHandler) already shows the commune and province names
+    if (isHoverlessDevice()) return;
+
+    // Styling is managed in index.css (.wfs-feature-tooltip) to support dark
+    // mode and override Leaflet defaults.
+    const tooltip = L.tooltip({
       direction: "top",
-      sticky: true,
       interactive: false,
       offset: [0, -5],
       className: "wfs-feature-tooltip",
-    });
-    // Mouse events for hover styling
+    }).setContent(getFeatureDisplayName(feature, isDistrictLayer));
+
+    const isMapDragging = () => Boolean(layer._map?.dragging?.moving());
+
     layer.on({
       mouseover: (e) => {
-        const target = e.target;
-        target.setStyle(hoverStyle);
-        // if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-        //   target.bringToFront();
-        // }
+        // Ignore features crossed while dragging the map
+        if (!layer._map || isMapDragging()) return;
+        layer.setStyle(hoverStyle);
+        tooltip.setLatLng(e.latlng).openOn(layer._map);
       },
-      mouseout: (e) => {
-        const target = e.target;
-        target.setStyle(baseStyle);
-        target.closeTooltip();
+      // Follow the cursor (sticky tooltip)
+      mousemove: (e) => {
+        if (tooltip.isOpen()) tooltip.setLatLng(e.latlng);
       },
+      mouseout: () => {
+        layer.setStyle(baseStyle);
+        tooltip.close();
+      },
+      // Layer removed (e.g. GeoJSON re-created on theme/zoom change)
+      remove: () => tooltip.close(),
     });
   };
 };
