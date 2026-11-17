@@ -1,6 +1,6 @@
 # Đặc tả chức năng Bản tin — Web GIS Ra đa Pha Đin
 
-Ngày lập: 16/11/2026. Trạng thái: **bản nháp chờ duyệt**, chưa viết mã.
+Ngày lập: 16/11/2026. Trạng thái: **đã duyệt** ngày 17/11/2026 (bước 0.1), chưa viết mã.
 Nguồn: README, hai mẫu bản tin docx, mã nguồn hiện tại và các câu trả lời của chủ dự án trong buổi trao đổi 16/11/2026.
 
 ## 1. Phạm vi
@@ -40,9 +40,11 @@ Nguồn: README, hai mẫu bản tin docx, mã nguồn hiện tại và các câ
 | Xã/phường | Lấy từ lớp `radar:all_new_meger_sub_district`, địa giới sau sáp nhập 2025, 16 tỉnh từ Thanh Hóa trở ra |
 | Ảnh ra đa | Dán, tải lên, hoặc chụp bản đồ web đang hiển thị; cả ba đều cắt được |
 | Email | Mỗi đơn vị một hộp Gmail riêng (mật khẩu ứng dụng); danh sách nhận cố định do Admin đơn vị sửa; chỉ đính kèm pdf |
-| Sau ban hành | Chỉ người soạn được sửa và gửi lại; không xóa |
+| Sau ban hành | Người soạn và Admin đơn vị của người soạn được sửa và gửi lại; phiên bản mới ghi tên người sửa; không xóa |
 | Mẫu | Cố định, nhưng thêm/sửa trường không phải viết lại giao diện |
-| Khách (chưa đăng nhập) | Xem được bản tin đã ban hành, chỉ đọc; không xem được bản nháp |
+| Khách (chưa đăng nhập) | Xem được nội dung bản tin đã ban hành trên web, chỉ đọc; không tải được docx/pdf, không thấy ảnh chữ ký; không xem được bản nháp |
+| Tải docx/pdf | Chỉ người đã đăng nhập (file có ảnh chữ ký thật) |
+| Giao diện mobile | Tạm thời chỉ xem danh sách và nội dung bản tin đã ban hành. Soạn, ban hành, sửa và gửi lại chỉ có trên desktop |
 | Thông tin công khai | API công khai chỉ trả về tên người soạn và đơn vị, không trả về email, số điện thoại hay thông tin tài khoản khác |
 | Server production | Ubuntu 24.04 LTS |
 
@@ -57,10 +59,12 @@ Vai trò đang có trong bảng `roles`: `SYSTEM_ADMIN`, `ADMIN`, `USER`. Đơn 
 | Thêm/sửa/khóa user | Có | Trong đơn vị mình | Không |
 | Cấu hình đơn vị (Gmail, người nhận, số khởi đầu) | Có | Trong đơn vị mình | Không |
 | Soạn và ban hành bản tin | Không | Có | Có |
-| Sửa và gửi lại | Không | Chỉ bản mình soạn | Chỉ bản mình soạn |
+| Sửa và gửi lại | Không | Bản mình soạn và bản của mọi người trong đơn vị mình | Chỉ bản mình soạn |
 | Xem bản tin đã ban hành của mọi đơn vị | Có | Có | Có |
+| Tải docx/pdf bản đã ban hành | Có | Có | Có |
 | Xem bản nháp | Không | Chỉ của mình | Chỉ của mình |
-| Khách (chưa đăng nhập) | Chỉ xem bản tin đã ban hành | Chỉ xem bản tin đã ban hành | Chỉ xem bản tin đã ban hành |
+
+Khách (chưa đăng nhập): chỉ xem nội dung bản tin đã ban hành trên web; không tải docx/pdf, không thấy ảnh chữ ký, không xem bản nháp.
 
 Thay đổi so với mã hiện tại:
 
@@ -116,7 +120,7 @@ Form nhập và việc kiểm tra dữ liệu đều sinh ra từ bản mô tả
 3. Màn hình soạn hai cột: form bên trái, bản xem trước giống văn bản thật bên phải.
 4. Bản nháp tự lưu lên server; nội dung đang soạn cũng được giữ tạm trên trình duyệt phòng khi mất mạng.
 5. **Ban hành**: kiểm tra ràng buộc, cấp số, chốt giờ phát, sinh docx và pdf, lưu trữ, gửi mail.
-6. Sau ban hành: tải docx/pdf, người soạn được **sửa và gửi lại** (giữ số, tạo phiên bản mới, tiêu đề mail thêm "(gửi lại)").
+6. Sau ban hành: tải docx/pdf, người soạn hoặc Admin đơn vị được **sửa và gửi lại** (giữ số, tạo phiên bản mới ghi tên người sửa, tiêu đề mail thêm "(gửi lại)").
 
 ### Ảnh ra đa
 
@@ -166,7 +170,8 @@ File ảnh, docx, pdf lưu trên đĩa server; CSDL lưu đường dẫn.
 Tất cả đặt sau `protectedRoute` và kiểm tra vai trò, trừ phần đọc bản tin đã ban hành (bên dưới).
 
 - `/api/bulletins` (cần đăng nhập): tạo nháp, xem nháp, sửa nháp, ban hành, sửa và gửi lại, gửi lại mail, nhập bản làm thủ công.
-- `/api/bulletins/published` (công khai, chỉ đọc): danh sách bản tin đã ban hành, xem chi tiết, tải docx/pdf. Không trả về bản nháp. Thông tin về người soạn chỉ gồm tên và đơn vị (đã chốt ở mục 2).
+- `/api/bulletins/published` (công khai, chỉ đọc): danh sách bản tin đã ban hành và xem chi tiết nội dung. Không trả về bản nháp, ảnh chữ ký hay file docx/pdf. Thông tin về người soạn chỉ gồm tên và đơn vị (đã chốt ở mục 2).
+- Tải docx/pdf bản đã ban hành: cần đăng nhập (đặt trong `/api/bulletins`).
 - `/api/bulletin-templates`: lấy mẫu và bản mô tả trường theo loại đơn vị; tải bộ làm thủ công.
 - `/api/uploads`: tải ảnh ra đa, ảnh chữ ký.
 - `/api/organizations`: cấu hình đơn vị (Gmail, người nhận, số khởi đầu).

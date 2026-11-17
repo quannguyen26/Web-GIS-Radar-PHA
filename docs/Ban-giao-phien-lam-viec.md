@@ -35,7 +35,8 @@ Cập nhật: 17/11/2026. Dùng để tiếp tục công việc ở phiên mới
 ## 3. Tóm tắt các quyết định chính
 
 - Làm bản tin Trạm ra đa trước; thiết kế mẫu theo kiểu "file docx + bản mô tả trường" để sau thêm mẫu Đài tỉnh.
-- User tự ban hành, không duyệt. Chỉ người soạn được sửa và gửi lại. Không xóa bản đã ban hành.
+- User tự ban hành, không duyệt. Người soạn và Admin đơn vị được sửa và gửi lại. Không xóa bản đã ban hành.
+- Khách chỉ xem nội dung bản tin đã ban hành; tải docx/pdf phải đăng nhập (file có chữ ký). Mobile chỉ xem.
 - Số bản tin đếm chung cả đơn vị, reset 1/1, cấp lúc ban hành, Admin đơn vị đặt số khởi đầu.
 - Một đoạn, một ảnh. Ảnh: dán, tải lên, hoặc chụp bản đồ web đang hiển thị rồi cắt.
 - Hướng di chuyển 32 hướng, chọn trên vòng la bàn. Phút tròn chục. Ngày trong tên file 8 ký tự.
