@@ -42,6 +42,8 @@ Nguồn: README, hai mẫu bản tin docx, mã nguồn hiện tại và các câ
 | Email | Mỗi đơn vị một hộp Gmail riêng (mật khẩu ứng dụng); danh sách nhận cố định do Admin đơn vị sửa; chỉ đính kèm pdf |
 | Sau ban hành | Chỉ người soạn được sửa và gửi lại; không xóa |
 | Mẫu | Cố định, nhưng thêm/sửa trường không phải viết lại giao diện |
+| Khách (chưa đăng nhập) | Xem được bản tin đã ban hành, chỉ đọc; không xem được bản nháp |
+| Thông tin công khai | API công khai chỉ trả về tên người soạn và đơn vị, không trả về email, số điện thoại hay thông tin tài khoản khác |
 | Server production | Ubuntu 24.04 LTS |
 
 ## 3. Phân quyền
@@ -58,6 +60,7 @@ Vai trò đang có trong bảng `roles`: `SYSTEM_ADMIN`, `ADMIN`, `USER`. Đơn 
 | Sửa và gửi lại | Không | Chỉ bản mình soạn | Chỉ bản mình soạn |
 | Xem bản tin đã ban hành của mọi đơn vị | Có | Có | Có |
 | Xem bản nháp | Không | Chỉ của mình | Chỉ của mình |
+| Khách (chưa đăng nhập) | Chỉ xem bản tin đã ban hành | Chỉ xem bản tin đã ban hành | Chỉ xem bản tin đã ban hành |
 
 Thay đổi so với mã hiện tại:
 
@@ -160,9 +163,10 @@ File ảnh, docx, pdf lưu trên đĩa server; CSDL lưu đường dẫn.
 
 ## 8. API dự kiến
 
-Tất cả đặt sau `protectedRoute` và kiểm tra vai trò.
+Tất cả đặt sau `protectedRoute` và kiểm tra vai trò, trừ phần đọc bản tin đã ban hành (bên dưới).
 
-- `/api/bulletins`: danh sách, tạo nháp, xem, sửa nháp, ban hành, sửa và gửi lại, gửi lại mail, tải docx/pdf, nhập bản làm thủ công.
+- `/api/bulletins` (cần đăng nhập): tạo nháp, xem nháp, sửa nháp, ban hành, sửa và gửi lại, gửi lại mail, nhập bản làm thủ công.
+- `/api/bulletins/published` (công khai, chỉ đọc): danh sách bản tin đã ban hành, xem chi tiết, tải docx/pdf. Không trả về bản nháp. Thông tin về người soạn chỉ gồm tên và đơn vị (đã chốt ở mục 2).
 - `/api/bulletin-templates`: lấy mẫu và bản mô tả trường theo loại đơn vị; tải bộ làm thủ công.
 - `/api/uploads`: tải ảnh ra đa, ảnh chữ ký.
 - `/api/organizations`: cấu hình đơn vị (Gmail, người nhận, số khởi đầu).
