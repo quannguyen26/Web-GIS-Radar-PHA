@@ -7,6 +7,26 @@ from the root `package.json`.
 > Everything in this file was verified against the source code, except the "Unknowns" section.
 > Do NOT treat anything in "Unknowns" as fact — ask the user.
 
+## Session workflow (two machines) — read first
+
+The owner works on two Windows PCs (home and office), both with the repo at `D:\Web-GIS-Radar-PHA`.
+Claude has no memory between sessions, so shared context lives in `docs/` and travels via GitHub:
+
+- `docs/Dac-ta-chuc-nang-ban-tin.md` — Bulletins feature spec (source of truth for decisions).
+- `docs/Ban-giao-phien-lam-viec.md` — session handoff: progress, pending items, next step.
+
+Bulletins work happens on branch `feature/ban-tin`.
+
+- **Start of session:** `git pull` on the current branch, then read both files in `docs/` before
+  doing anything else. Tell the owner the next step from the handoff.
+- **End of session (when the owner says they are leaving):** update the handoff (sections 1 and 7,
+  plus the date), then commit and push to `feature/ban-tin`. This request counts as approval to
+  commit/push the session's work.
+- Every schema change is also saved as a `.sql` file in the repo, so the other machine's local DB
+  can be updated.
+- The owner is learning web development: explain each step in simple Vietnamese before doing it,
+  work in small pieces, and let the owner review each piece.
+
 ## Commands
 
 | Purpose | Command (run from repo root) |
@@ -149,4 +169,4 @@ frontend/src/
 - Deployment (Nginx? contents of the gitignored `deploy/`), production domain/CORS, Node version.
 - Official permission model (old README: System Admin / Admin / User) and which roles may create accounts via `/signup`.
 - Whether the map page requires login; the value of `LIMIT_PRODUCTS`.
-- Phase 2 spec (Bulletins, System status), test strategy, branch/PR workflow.
+- Phase 2 spec for System status, test strategy, PR workflow. (Bulletins spec: `docs/`.)
