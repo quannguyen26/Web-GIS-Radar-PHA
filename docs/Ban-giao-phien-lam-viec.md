@@ -1,6 +1,6 @@
 # Bàn giao phiên làm việc — chức năng Bản tin
 
-Cập nhật: 17/11/2026. Dùng để tiếp tục công việc ở phiên mới, ở bất kỳ máy nào.
+Cập nhật: 18/11/2026. Dùng để tiếp tục công việc ở phiên mới, ở bất kỳ máy nào.
 
 ## 0. Cách dùng file này (đọc trước)
 
@@ -17,7 +17,8 @@ Cập nhật: 17/11/2026. Dùng để tiếp tục công việc ở phiên mới
 - Đã xong (17/11): tạo nhánh `feature/ban-tin`, chuyển đặc tả và file bàn giao vào `docs/`, thêm quy ước làm việc 2 máy vào `CLAUDE.md`.
 - **Chưa viết dòng mã chức năng nào**, chưa chạy SQL nào, chưa cài gói nào.
 - Chủ dự án vừa làm dự án vừa học lập trình web: mỗi bước cần giải thích trước, làm từng phần nhỏ, để chủ dự án tự viết hoặc duyệt từng đoạn (xem tab "Cách làm mỗi bước" trong lộ trình).
-- Bước kế tiếp: xem ô "Bước tiếp theo" trên tab Lộ trình (hiện là 0.1 — duyệt đặc tả). Đọc trạng thái mới nhất trong Sheet trước khi làm.
+- Đã xong (18/11): duyệt thiết kế 4 màn hình (bước 0.2). Chốt thêm: xóa nháp có xác nhận; giờ phát tin sửa được, phút theo bước 5 (giờ ảnh vẫn tròn chục).
+- Bước kế tiếp: xem ô "Bước tiếp theo" trên tab Lộ trình (hiện là 0.4 — đọc hiểu backend). Đọc trạng thái mới nhất trong Sheet trước khi làm.
 
 ## 2. Tài liệu đã có
 
@@ -25,7 +26,7 @@ Cập nhật: 17/11/2026. Dùng để tiếp tục công việc ở phiên mới
 |---|---|
 | **Lộ trình và theo dõi tiến độ** (66 bước, 10 giai đoạn; cột Xong khi, Học gì; tab Theo giai đoạn, Cách làm mỗi bước) | https://claude.ai/artifact/VZFEyQZpqiJvjGeghiyPo2 |
 | Đặc tả chức năng (quyết định, phân quyền, trường mẫu, luồng, dữ liệu, API, thứ tự làm) | `docs/Dac-ta-chuc-nang-ban-tin.md` |
-| Thiết kế giao diện, 3 màn hình: danh sách, soạn bản tin, chọn ảnh | https://claude.ai/artifact/LPcbvPoyUWhiwaXh24Xc87 |
+| Thiết kế giao diện, 4 màn hình: danh sách, soạn bản tin, chọn ảnh, xem bản tin (đổi người xem bằng Tweaks › viewer) | https://claude.ai/artifact/LPcbvPoyUWhiwaXh24Xc87 |
 | Mẫu bản tin Trạm ra đa có chú giải trường {1}–{28} | Project claude.ai: `PDIN_DONG_20260928_01h20 (Mẫu tin Trạm Ra đa).docx` (sẽ đưa bản sạch vào repo khi làm phần xuất bản tin) |
 | Mẫu bản tin Đài tỉnh (chưa hoàn thiện) | Project claude.ai: `SOLA_DONG_20260917_1130 (Mẫu tỉnh Đài Tỉnh).docx` |
 | Quy tắc làm việc với mã nguồn | `CLAUDE.md` ở gốc repo |
@@ -39,7 +40,7 @@ Cập nhật: 17/11/2026. Dùng để tiếp tục công việc ở phiên mới
 - Khách chỉ xem nội dung bản tin đã ban hành; tải docx/pdf phải đăng nhập (file có chữ ký). Mobile chỉ xem.
 - Số bản tin đếm chung cả đơn vị, reset 1/1, cấp lúc ban hành, Admin đơn vị đặt số khởi đầu.
 - Một đoạn, một ảnh. Ảnh: dán, tải lên, hoặc chụp bản đồ web đang hiển thị rồi cắt.
-- Hướng di chuyển 32 hướng, chọn trên vòng la bàn. Phút tròn chục. Ngày trong tên file 8 ký tự.
+- Hướng di chuyển 32 hướng, chọn trên vòng la bàn. Giờ ảnh phút tròn chục; giờ phát tin và phút trong tên file theo bước 5 (đổi 18/11/2026). Ngày trong tên file 8 ký tự.
 - Xã/phường lấy từ lớp `radar:all_new_meger_sub_district`; tỉnh chọn đủ xã thì ghi "các xã phường thuộc tỉnh ...".
 - Gmail riêng từng đơn vị (mật khẩu ứng dụng, lưu mã hóa), danh sách nhận do Admin đơn vị sửa, chỉ đính kèm pdf. Gửi lỗi thì bản tin vẫn ban hành, có nút gửi lại.
 - Chữ ký là ảnh PNG theo tài khoản; chưa có thì không ban hành được.
@@ -78,11 +79,9 @@ Chủ dự án cho biết các bảng này chưa hoàn thiện, cần bổ sung.
 
 ## 7. Đang chờ chủ dự án
 
-1. Duyệt đặc tả, nhất là bảng phân quyền (System Admin không soạn bản tin, Admin đơn vị soạn được như user).
-2. Duyệt thiết kế giao diện.
-3. Cho phép cài gói (sẽ nêu tên từng gói trước khi cài).
-4. Chuẩn bị: file docx mẫu bản sạch không có chú giải, LibreOffice trên máy dev (cả 2 máy), danh sách câu có sẵn cho {20} và {23}, ảnh chữ ký mẫu, Gmail của trạm kèm mật khẩu ứng dụng và danh sách người nhận.
-5. Trong Project claude.ai: thêm thư mục `docs` vào nguồn GitHub, đổi nhánh đồng bộ sang `feature/ban-tin`, rồi xóa 2 bản cũ `claude/Dac-ta-chuc-nang-ban-tin.md` và `claude/Ban-giao-phien-lam-viec.md`.
+1. Cho phép cài gói (sẽ nêu tên từng gói trước khi cài).
+2. Chuẩn bị: file docx mẫu bản sạch không có chú giải, LibreOffice trên máy dev (cả 2 máy), danh sách câu có sẵn cho {20} và {23}, ảnh chữ ký mẫu, Gmail của trạm kèm mật khẩu ứng dụng và danh sách người nhận.
+3. Trong Project claude.ai: thêm thư mục `docs` vào nguồn GitHub, đổi nhánh đồng bộ sang `feature/ban-tin`, rồi xóa 2 bản cũ `claude/Dac-ta-chuc-nang-ban-tin.md` và `claude/Ban-giao-phien-lam-viec.md`.
 
 ## 8. Việc còn mở về kỹ thuật
 

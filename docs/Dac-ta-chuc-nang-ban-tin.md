@@ -33,8 +33,9 @@ Nguồn: README, hai mẫu bản tin docx, mã nguồn hiện tại và các câ
 | Chữ ký {26} | Ảnh PNG gắn theo tài khoản; user tự tải lên, Admin đơn vị thay được; chưa có thì không ban hành được |
 | Số bản tin {1} | Đếm chung cả đơn vị, reset 1/1 hằng năm, cấp lúc ban hành; Admin đơn vị đặt số khởi đầu |
 | Nội dung | Một đoạn, một ảnh; {9} có thể gồm nhiều tỉnh |
-| Thời gian | Định dạng 24h, phút tròn chục; giờ phát tin phải sau giờ ảnh |
-| Tên file | `<mã 4 ký tự>_<DONG hoặc MLDR>_<yyyymmdd>_<hh>h<mm>`, ngày 8 ký tự |
+| Thời gian | Định dạng 24h. Giờ ảnh: phút tròn chục. Giờ phát tin: phút theo bước 5 (00, 05, 10, …, 55); tự điền mốc 5 phút kế tiếp, người soạn sửa được, nhưng vẫn phải theo bước 5 và sau giờ ảnh (đổi ngày 18/11/2026, trước đó là tròn chục) |
+| Bản nháp | Người soạn xóa được bản nháp của mình (có hộp xác nhận) |
+| Tên file | `<mã 4 ký tự>_<DONG hoặc MLDR>_<yyyymmdd>_<hh>h<mm>`, ngày 8 ký tự; phút `<mm>` theo bước 5 như giờ phát tin |
 | Hướng di chuyển {12} | 32 hướng, chọn trên vòng tròn la bàn |
 | Lựa chọn có sẵn ({5}, {20}, {23}) | Chọn hoặc gõ tay; câu gõ tay không lưu lại thành lựa chọn |
 | Xã/phường | Lấy từ lớp `radar:all_new_meger_sub_district`, địa giới sau sáp nhập 2025, 16 tỉnh từ Thanh Hóa trở ra |
@@ -99,7 +100,7 @@ Form nhập và việc kiểm tra dữ liệu đều sinh ra từ bản mô tả
 | {20} | Nhận định 1–3 giờ tới | Chọn câu có sẵn hoặc gõ tay |
 | {21}, {22} | Xã/phường và tỉnh cảnh báo | Chọn trên bản đồ hoặc tìm theo tên; hệ thống tự ghép câu, sửa tay được |
 | {23} | Hiện tượng cần đề phòng | Chọn câu có sẵn hoặc gõ tay |
-| {24}, {25} | Giờ phát tin | Tự điền, tròn chục, phải sau giờ ảnh |
+| {24}, {25} | Giờ phát tin | Tự điền, sửa được; phút theo bước 5, phải sau giờ ảnh |
 | {26}, {27} | Chữ ký, họ tên | Lấy từ tài khoản |
 | {28} | Ảnh ra đa | Dán, tải lên hoặc chụp bản đồ |
 
@@ -110,7 +111,7 @@ Form nhập và việc kiểm tra dữ liệu đều sinh ra từ bản mô tả
 
 ### Tên file và tiêu đề mail
 
-- Tên file: `PDIN_DONG_20260928_01h20.docx` (và `.pdf`). Loại là `MLDR` khi {5} là MƯA DÔNG DIỆN RỘNG, còn lại là `DONG`.
+- Tên file: `PDIN_DONG_20260928_01h20.docx` (và `.pdf`); phút theo bước 5, ví dụ `01h25`. Loại là `MLDR` khi {5} là MƯA DÔNG DIỆN RỘNG, còn lại là `DONG`.
 - Tiêu đề mail: `28.09.2026 - Bản tin cảnh báo mưa dông. RĐPĐ-913`. Khi gửi lại thêm ` (gửi lại)` ở cuối.
 
 ## 5. Luồng sử dụng
@@ -120,7 +121,8 @@ Form nhập và việc kiểm tra dữ liệu đều sinh ra từ bản mô tả
 3. Màn hình soạn hai cột: form bên trái, bản xem trước giống văn bản thật bên phải.
 4. Bản nháp tự lưu lên server; nội dung đang soạn cũng được giữ tạm trên trình duyệt phòng khi mất mạng.
 5. **Ban hành**: kiểm tra ràng buộc, cấp số, chốt giờ phát, sinh docx và pdf, lưu trữ, gửi mail.
-6. Sau ban hành: tải docx/pdf, người soạn hoặc Admin đơn vị được **sửa và gửi lại** (giữ số, tạo phiên bản mới ghi tên người sửa, tiêu đề mail thêm "(gửi lại)").
+6. **Xem bản tin** (bấm số bản tin trong danh sách): nội dung như văn bản thật, thông tin, lịch sử phiên bản; nút hiện theo quyền. Khách và mobile cũng dùng màn này (chỉ đọc).
+7. Sau ban hành: tải docx/pdf, người soạn hoặc Admin đơn vị được **sửa và gửi lại** (giữ số, tạo phiên bản mới ghi tên người sửa, tiêu đề mail thêm "(gửi lại)").
 
 ### Ảnh ra đa
 
@@ -169,7 +171,7 @@ File ảnh, docx, pdf lưu trên đĩa server; CSDL lưu đường dẫn.
 
 Tất cả đặt sau `protectedRoute` và kiểm tra vai trò, trừ phần đọc bản tin đã ban hành (bên dưới).
 
-- `/api/bulletins` (cần đăng nhập): tạo nháp, xem nháp, sửa nháp, ban hành, sửa và gửi lại, gửi lại mail, nhập bản làm thủ công.
+- `/api/bulletins` (cần đăng nhập): tạo nháp, xem nháp, sửa nháp, xóa nháp, ban hành, sửa và gửi lại, gửi lại mail, nhập bản làm thủ công.
 - `/api/bulletins/published` (công khai, chỉ đọc): danh sách bản tin đã ban hành và xem chi tiết nội dung. Không trả về bản nháp, ảnh chữ ký hay file docx/pdf. Thông tin về người soạn chỉ gồm tên và đơn vị (đã chốt ở mục 2).
 - Tải docx/pdf bản đã ban hành: cần đăng nhập (đặt trong `/api/bulletins`).
 - `/api/bulletin-templates`: lấy mẫu và bản mô tả trường theo loại đơn vị; tải bộ làm thủ công.
