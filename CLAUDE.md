@@ -140,6 +140,10 @@ frontend/src/
   or dev databases**. Never on production. If the target environment is not clearly local/dev, ask first.
 - There are no migrations: report every schema change as SQL to the user so it can be applied to
   other environments.
+- App DB SQL files live in `backend/sql/`: numbered change files `001_…`, `002_…` (run once on an
+  existing DB) and `000_create_webgis_app.sql` = the full current schema + lookup data (for an empty
+  DB). **Every** new table/column/constraint goes into a new numbered file **and** into `000`
+  (update its "Last synced with" line). Never commit user rows or password hashes.
 - The Geo DB is shared with GeoServer: the app only reads it; do not change its tables/triggers
   outside local/dev without approval.
 - Never print, log, or commit `.env` values; never hardcode secrets, passwords, or tokens.
