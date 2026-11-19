@@ -1,6 +1,6 @@
 # Bàn giao phiên làm việc — chức năng Bản tin
 
-Cập nhật: 18/11/2026. Dùng để tiếp tục công việc ở phiên mới, ở bất kỳ máy nào.
+Cập nhật: 19/11/2026. Dùng để tiếp tục công việc ở phiên mới, ở bất kỳ máy nào.
 
 ## 0. Cách dùng file này (đọc trước)
 
@@ -15,10 +15,15 @@ Cập nhật: 18/11/2026. Dùng để tiếp tục công việc ở phiên mới
 
 - Đã xong: trao đổi và chốt ý tưởng, viết đặc tả, vẽ thiết kế giao diện, **lập lộ trình 66 bước có theo dõi tiến độ** (xem mục 2).
 - Đã xong (17/11): tạo nhánh `feature/ban-tin`, chuyển đặc tả và file bàn giao vào `docs/`, thêm quy ước làm việc 2 máy vào `CLAUDE.md`.
-- **Chưa viết dòng mã chức năng nào**, chưa chạy SQL nào, chưa cài gói nào.
+- Chưa viết dòng mã chức năng nào, chưa cài gói nào.
+- Đã xong toàn bộ giai đoạn 0 (0.1–0.7, ngày 17–18/11).
+- Đã xong (18/11) bước 1.1, commit `b21aabd`: thư mục `backend/sql/` gồm
+  - `001_ban_tin_users_organizations.sql`: thay đổi cho DB đã có. Đã chạy trên `webgis_app`.
+  - `000_create_webgis_app.sql`: toàn bộ cấu trúc hiện tại cùng dữ liệu danh mục, dùng để tạo lại DB trống. **Quy tắc:** mỗi thay đổi bảng sau này phải có file số mới **và** thêm vào `000` (đã ghi trong `CLAUDE.md`).
+- **Máy cơ quan:** `backend/.env` trỏ thẳng vào **DB production** (máy này không cài PostgreSQL). Chủ dự án cho phép sửa, nhưng **chỉ trong `webgis_app`**; không đụng DB Geo.
 - Chủ dự án vừa làm dự án vừa học lập trình web: mỗi bước cần giải thích trước, làm từng phần nhỏ, để chủ dự án tự viết hoặc duyệt từng đoạn (xem tab "Cách làm mỗi bước" trong lộ trình).
 - Đã xong (18/11): duyệt thiết kế 4 màn hình (bước 0.2). Chốt thêm: xóa nháp có xác nhận; giờ phát tin sửa được, phút theo bước 5 (giờ ảnh vẫn tròn chục).
-- Bước kế tiếp: xem ô "Bước tiếp theo" trên tab Lộ trình (hiện là 0.4 — đọc hiểu backend). Đọc trạng thái mới nhất trong Sheet trước khi làm.
+- Bước kế tiếp: xem ô "Bước tiếp theo" trên tab Lộ trình (hiện là **1.2**: thêm mã vai trò và loại đơn vị vào access token và `/users/me`). Đọc trạng thái mới nhất trong Sheet trước khi làm. Mỗi bước làm trong một session riêng.
 
 ## 2. Tài liệu đã có
 
@@ -59,6 +64,18 @@ Cập nhật: 18/11/2026. Dùng để tiếp tục công việc ở phiên mới
 
 Chủ dự án cho biết các bảng này chưa hoàn thiện, cần bổ sung.
 
+**Đã bổ sung ở bước 1.1 (18/11):**
+- `users.organization_id` được để trống, ràng buộc `CHECK ((role_id = 1) = (organization_id IS NULL))`: System Admin thì không có đơn vị, vai trò khác bắt buộc có.
+- `users` thêm cột `signature_path`.
+- `organizations` thêm các cột:
+  - `file_code`: 4 ký tự, không trùng giữa các đơn vị.
+  - `doc_symbol`, `place_name`.
+  - `bulletin_start_number`: mặc định 1.
+  - `gmail_address`, `gmail_app_password_enc`.
+  - `email_recipients`: kiểu `text[]`. Tạm để đơn giản; sau này Admin thêm, sửa ở bước 6.4.
+- Dữ liệu: RDPD có `PDIN` / `RĐPĐ` / `Pha Đin`. SOLA chỉ có `file_code` = `SOLA`.
+- Phát hiện, chưa sửa: `sessions.user_id` có kiểu `integer` trong khi `users.id` là `bigint`.
+
 **Làm việc 2 máy:** mỗi máy có CSDL local riêng. Mọi lệnh SQL thay đổi cấu trúc phải lưu thành file trong repo (ví dụ `backend/sql/` — đặt tên khi làm bước 1) để chạy lại trên máy kia.
 
 ## 5. Điều đã biết từ mã nguồn
@@ -81,7 +98,11 @@ Chủ dự án cho biết các bảng này chưa hoàn thiện, cần bổ sung.
 
 1. Cho phép cài gói (sẽ nêu tên từng gói trước khi cài).
 2. Chuẩn bị: file docx mẫu bản sạch không có chú giải, LibreOffice trên máy dev (cả 2 máy), danh sách câu có sẵn cho {20} và {23}, ảnh chữ ký mẫu, Gmail của trạm kèm mật khẩu ứng dụng và danh sách người nhận.
-3. Trong Project claude.ai: thêm thư mục `docs` vào nguồn GitHub, đổi nhánh đồng bộ sang `feature/ban-tin`, rồi xóa 2 bản cũ `claude/Dac-ta-chuc-nang-ban-tin.md` và `claude/Ban-giao-phien-lam-viec.md`.
+3. **Máy nhà:** kiểm tra `DB_HOST` trong `backend/.env`.
+   - Nếu là DB local riêng: chạy `backend/sql/001_ban_tin_users_organizations.sql` vào `webgis_app`.
+   - Nếu cũng trỏ vào DB production: **không chạy lại**, vì 001 đã được áp dụng.
+4. `CLAUDE.md` vẫn ghi "DB trong `.env` là local". Điều này không đúng với máy cơ quan; cần chủ dự án quyết định sửa câu này thế nào.
+5. Trong Project claude.ai: thêm thư mục `docs` vào nguồn GitHub, đổi nhánh đồng bộ sang `feature/ban-tin`, rồi xóa 2 bản cũ `claude/Dac-ta-chuc-nang-ban-tin.md` và `claude/Ban-giao-phien-lam-viec.md`.
 
 ## 8. Việc còn mở về kỹ thuật
 
