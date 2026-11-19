@@ -185,7 +185,9 @@ export const signIn = async (req, res) => {
         id: user.id,
         username: user.username,
         roleId: user.role_id,
+        roleCode: user.role_code,
         organizationId: user.organization_id,
+        organizationType: user.organization_type,
       },
       // @ts-ignore
       process.env.ACCESS_TOKEN_SECRET,
@@ -263,9 +265,13 @@ export const refreshToken = async (req, res) => {
     // Query session joined with users to verify validity and obtain claims
     const result = await poolApp.query(
       `SELECT s.id AS session_id, s.user_id, s.expires_at,
-              u.username, u.role_id, u.organization_id
+              u.username, u.role_id, u.organization_id,
+              r.code AS role_code,
+              o.organization_type
        FROM sessions s
        JOIN users u ON s.user_id = u.id
+       LEFT JOIN roles r ON u.role_id = r.id
+       LEFT JOIN organizations o ON u.organization_id = o.id
        WHERE s.refresh_token = $1`,
       [token],
     );
@@ -291,7 +297,9 @@ export const refreshToken = async (req, res) => {
         id: session.user_id,
         username: session.username,
         roleId: session.role_id,
+        roleCode: session.role_code,
         organizationId: session.organization_id,
+        organizationType: session.organization_type,
       },
       // @ts-ignore
       process.env.ACCESS_TOKEN_SECRET,

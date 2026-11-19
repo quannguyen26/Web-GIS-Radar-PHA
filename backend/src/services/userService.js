@@ -4,8 +4,9 @@ import poolApp from "../../libs/dbWebApp.js";
 const USER_DETAILS_SELECT = `
   SELECT u.id, u.username, u.password_hash, u.full_name, u.email, u.phone,
          t.id AS title_id, t.name AS title_name,
-         r.id AS role_id, r.name AS role_name,
-         o.id AS organization_id, o.name AS organization_name
+         r.id AS role_id, r.code AS role_code, r.name AS role_name,
+         o.id AS organization_id, o.name AS organization_name,
+         o.organization_type
   FROM users u
   LEFT JOIN titles t ON u.title_id = t.id
   LEFT JOIN roles r ON u.role_id = r.id
@@ -25,9 +26,12 @@ export const toUserDTO = (row) => ({
   titleId: row.title_id,
   titleName: row.title_name,
   roleId: row.role_id,
+  roleCode: row.role_code,
   roleName: row.role_name,
   organizationId: row.organization_id,
   organizationName: row.organization_name,
+  // null for SYSTEM_ADMIN (no organization)
+  organizationType: row.organization_type,
 });
 
 /** Lấy bản ghi user thô (kèm password_hash) theo username — dùng cho đăng nhập. */
