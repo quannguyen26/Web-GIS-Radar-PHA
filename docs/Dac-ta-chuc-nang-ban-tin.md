@@ -57,6 +57,7 @@ Vai trò đang có trong bảng `roles`: `SYSTEM_ADMIN`, `ADMIN`, `USER`. Đơn 
 |---|---|---|---|
 | Quản lý đơn vị | Có | Không | Không |
 | Tạo tài khoản Admin | Có | Không | Không |
+| Tạo tài khoản System Admin | Không (chỉ tạo trực tiếp trong DB) | Không | Không |
 | Thêm/sửa/khóa user | Có | Trong đơn vị mình | Không |
 | Cấu hình đơn vị (Gmail, người nhận, số khởi đầu) | Có | Trong đơn vị mình | Không |
 | Soạn và ban hành bản tin | Không | Có | Có |
@@ -69,7 +70,7 @@ Khách (chưa đăng nhập): chỉ xem nội dung bản tin đã ban hành trê
 
 Thay đổi so với mã hiện tại:
 
-- `/api/auth/signup` hiện cho mọi người đã đăng nhập tạo tài khoản với bất kỳ vai trò nào. Sẽ khóa lại theo bảng trên.
+- `/api/auth/signup` hiện cho mọi người đã đăng nhập tạo tài khoản với bất kỳ vai trò nào. Sẽ khóa lại theo bảng trên: System Admin tạo được ADMIN và USER ở mọi đơn vị; Admin chỉ tạo USER trong đơn vị mình; không ai tạo được System Admin qua API (chốt 20/11/2026).
 - Access token hiện chứa `roleId` và `organizationId`. Sẽ thêm mã vai trò và thêm middleware kiểm tra vai trò, đơn vị cho từng API.
 - System Admin không thuộc đơn vị nào, nên `users.organization_id` sẽ cho phép để trống với riêng vai trò này.
 

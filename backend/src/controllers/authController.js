@@ -3,6 +3,7 @@ import poolApp from "../../libs/dbWebApp.js";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { findUserByUsername, toUserDTO } from "../services/userService.js";
+import { canAccessOrganization } from "../middleware/authMiddleware.js";
 
 const ACCESS_TOKEN_TTL = "15m";
 const REFRESH_TOKEN_TTL = 14 * 24 * 60 * 60 * 1000; // 14 days
@@ -64,6 +65,13 @@ const validateSignUpInput = ({
   return null;
 };
 
+// Which roles each creator role may create (spec section 3).
+// Nobody may create SYSTEM_ADMIN through the API.
+const CREATABLE_ROLES = {
+  SYSTEM_ADMIN: ["ADMIN", "USER"],
+  ADMIN: ["USER"],
+};
+
 // Generate an opaque random refresh token
 const generateRefreshToken = () => crypto.randomBytes(64).toString("hex");
 
@@ -108,6 +116,31 @@ export const signUp = async (req, res) => {
       return res.status(400).json({ message: validationError });
     }
 
+    // The client sends a role id: look up its code instead of hardcoding ids
+    const roleResult = await poolApp.query(
+      "SELECT code FROM roles WHERE id = $1",
+      [role],
+    );
+    const targetRoleCode = roleResult.rows[0]?.code;
+    if (!targetRoleCode) {
+      return res.status(400).json({ message: "role không tồn tại" });
+    }
+
+    // Creator's role comes from the signed token, never from the request body
+    const creatableRoles = CREATABLE_ROLES[req.user.roleCode] ?? [];
+    if (!creatableRoles.includes(targetRoleCode)) {
+      return res
+        .status(403)
+        .json({ message: "Bạn không được tạo tài khoản với vai trò này" });
+    }
+
+    // ADMIN: only inside their own organization. SYSTEM_ADMIN: any organization.
+    if (!canAccessOrganization(req.user, organization)) {
+      return res.status(403).json({
+        message: "Bạn chỉ được tạo tài khoản trong đơn vị của mình",
+      });
+    }
+
     // Check if username already exists
     const duplicate = await poolApp.query(
       "SELECT id FROM users WHERE username = $1",
@@ -148,6 +181,16 @@ export const signUp = async (req, res) => {
       },
     });
   } catch (error) {
+    // Foreign key violation: title or organization id does not exist
+    if (error.code === "23503") {
+      return res
+        .status(400)
+        .json({ message: "title hoặc organization không tồn tại" });
+    }
+    // Unique violation: same username inserted at the same time
+    if (error.code === "23505") {
+      return res.status(409).json({ message: "username đã tồn tại" });
+    }
     console.error("Lỗi khi gọi signUp", error);
     return res.status(500).json({ message: "Lỗi hệ thống" });
   }
