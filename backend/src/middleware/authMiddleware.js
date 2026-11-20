@@ -31,3 +31,46 @@ export const protectedRoute = (req, res, next) => {
     return res.status(500).json({ message: "Lỗi hệ thống" });
   }
 };
+
+/**
+ * Middleware factory: only lets through users whose role code is in the list.
+ * Must be placed AFTER protectedRoute (it reads req.user set by the token).
+ *
+ * Usage: router.post("/signup", protectedRoute, requireRole("SYSTEM_ADMIN", "ADMIN"), signUp);
+ *
+ * 401 = not logged in (who are you?), 403 = logged in but not allowed.
+ */
+export const requireRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({ message: "Chưa đăng nhập" });
+    }
+
+    if (!allowedRoles.includes(req.user.roleCode)) {
+      return res
+        .status(403)
+        .json({ message: "Bạn không có quyền thực hiện thao tác này" });
+    }
+
+    next();
+  };
+};
+
+/**
+ * Organization check for data that belongs to an organization
+ * (a user account, a bulletin, organization settings...).
+ * SYSTEM_ADMIN may act on every organization; everyone else only on their own.
+ *
+ * Not a middleware: the target organization is usually known only after
+ * reading the record from the DB, so controllers call this function.
+ */
+export const canAccessOrganization = (user, organizationId) => {
+  if (!user) return false;
+  if (user.roleCode === "SYSTEM_ADMIN") return true;
+  // Compare as numbers: ids may come back from pg/JWT as string or number
+  return (
+    user.organizationId != null &&
+    organizationId != null &&
+    Number(user.organizationId) === Number(organizationId)
+  );
+};
