@@ -68,6 +68,13 @@ Vai trò đang có trong bảng `roles`: `SYSTEM_ADMIN`, `ADMIN`, `USER`. Đơn 
 
 Khách (chưa đăng nhập): chỉ xem nội dung bản tin đã ban hành trên web; không tải docx/pdf, không thấy ảnh chữ ký, không xem bản nháp.
 
+Chi tiết quản lý user (chốt 20/11/2026, bước 1.5):
+
+- Xem danh sách: System Admin xem mọi user; Admin xem user trong đơn vị mình.
+- Sửa, khóa/mở, đặt lại mật khẩu: System Admin làm với mọi ADMIN và USER; Admin **chỉ với USER** trong đơn vị mình (không với ADMIN khác). Tài khoản SYSTEM_ADMIN không sửa/khóa được qua API. Không ai tự khóa chính mình.
+- Trường được sửa: họ tên, email, số điện thoại, chức danh. Riêng System Admin đổi được vai trò (ADMIN ↔ USER) và đơn vị. Không ai đổi được username.
+- Tài khoản bị khóa không đăng nhập và không refresh được; khi khóa hoặc đặt lại mật khẩu thì mọi phiên đăng nhập cũ của user đó bị hủy.
+
 Thay đổi so với mã hiện tại:
 
 - `/api/auth/signup` hiện cho mọi người đã đăng nhập tạo tài khoản với bất kỳ vai trò nào. Sẽ khóa lại theo bảng trên: System Admin tạo được ADMIN và USER ở mọi đơn vị; Admin chỉ tạo USER trong đơn vị mình; không ai tạo được System Admin qua API (chốt 20/11/2026).

@@ -222,6 +222,12 @@ export const signIn = async (req, res) => {
         .json({ message: "username hoặc password không chính xác" });
     }
 
+    // Locked account: checked after the password so the lock status is only
+    // revealed to someone who knows the password
+    if (!user.active) {
+      return res.status(403).json({ message: "Tài khoản đã bị khóa" });
+    }
+
     // Generate access token with JWT
     const accessToken = jwt.sign(
       {
@@ -308,7 +314,7 @@ export const refreshToken = async (req, res) => {
     // Query session joined with users to verify validity and obtain claims
     const result = await poolApp.query(
       `SELECT s.id AS session_id, s.user_id, s.expires_at,
-              u.username, u.role_id, u.organization_id,
+              u.username, u.role_id, u.organization_id, u.active,
               r.code AS role_code,
               o.organization_type
        FROM sessions s
@@ -332,6 +338,14 @@ export const refreshToken = async (req, res) => {
         token,
       ]);
       return res.status(403).json({ message: "Refresh Token đã hết hạn." });
+    }
+
+    // Locked account: end this session too
+    if (!session.active) {
+      await poolApp.query("DELETE FROM sessions WHERE id = $1", [
+        session.session_id,
+      ]);
+      return res.status(403).json({ message: "Tài khoản đã bị khóa" });
     }
 
     // Generate new access token
