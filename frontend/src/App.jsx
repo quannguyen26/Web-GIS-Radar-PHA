@@ -12,8 +12,11 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          <Route path="/" element={<DashBoard />} />
-          <Route path="/login" element={<Login />} />
+          {/* Login is a modal nested in the dashboard route, so the map stays
+              mounted when moving between "/" and "/login" */}
+          <Route path="/" element={<DashBoard />}>
+            <Route path="login" element={<Login />} />
+          </Route>
 
           {/* Admin area: every nested route requires an admin role */}
           <Route element={<ProtectedRoute allowedRoles={ADMIN_ROLES} />}>

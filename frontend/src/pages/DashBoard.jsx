@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Outlet } from "react-router-dom";
 import SideBar from "../components/layout/SideBar";
 import Header from "../components/layout/Header";
 import { SelectionProvider } from "../context/SelectionContext";
@@ -29,6 +30,8 @@ const DashBoard = () => {
             </div>
           </div>
         </div>
+        {/* Nested routes rendered over the dashboard (e.g. the login modal) */}
+        <Outlet />
       </SelectionProvider>
     </ThemeProvider>
   );

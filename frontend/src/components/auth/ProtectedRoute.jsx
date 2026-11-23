@@ -1,4 +1,4 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import Forbidden from "../../pages/Forbidden";
@@ -8,6 +8,7 @@ import Forbidden from "../../pages/Forbidden";
 // This only hides UI; the backend still checks every API call.
 const ProtectedRoute = ({ allowedRoles }) => {
   const { user, isLoading, isAuthenticated } = useAuth();
+  const location = useLocation();
 
   // Wait for the session restore on page load (F5), otherwise a logged-in
   // user would be sent to /login before /auth/refresh finishes
@@ -24,7 +25,8 @@ const ProtectedRoute = ({ allowedRoles }) => {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    // Remember the requested page so Login can come back to it
+    return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
   if (allowedRoles && !allowedRoles.includes(user?.roleCode)) {
