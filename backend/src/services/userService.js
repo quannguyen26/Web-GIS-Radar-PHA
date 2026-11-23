@@ -95,6 +95,14 @@ export const setUserPasswordHash = async (id, passwordHash) => {
   );
 };
 
+/** Record a successful sign-in (shown as "Đăng nhập gần nhất" to admins). */
+export const setUserLastLogin = async (id) => {
+  await poolApp.query(
+    "UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = $1",
+    [id],
+  );
+};
+
 /** Log the user out everywhere: delete all their refresh-token sessions. */
 export const deleteUserSessions = async (userId) => {
   await poolApp.query("DELETE FROM sessions WHERE user_id = $1", [userId]);

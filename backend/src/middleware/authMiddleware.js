@@ -56,6 +56,14 @@ export const requireRole = (...allowedRoles) => {
   };
 };
 
+// Which roles each creator role may create or assign (spec section 3).
+// Nobody may create SYSTEM_ADMIN through the API. Used by /auth/signup and
+// /lookups (so the form only offers roles the backend will accept).
+export const CREATABLE_ROLES = {
+  SYSTEM_ADMIN: ["ADMIN", "USER"],
+  ADMIN: ["USER"],
+};
+
 /**
  * Organization check for data that belongs to an organization
  * (a user account, a bulletin, organization settings...).

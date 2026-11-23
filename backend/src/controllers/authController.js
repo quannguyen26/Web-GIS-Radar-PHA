@@ -2,8 +2,15 @@ import bcrypt from "bcrypt";
 import poolApp from "../../libs/dbWebApp.js";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import { findUserByUsername, toUserDTO } from "../services/userService.js";
-import { canAccessOrganization } from "../middleware/authMiddleware.js";
+import {
+  findUserByUsername,
+  setUserLastLogin,
+  toUserDTO,
+} from "../services/userService.js";
+import {
+  canAccessOrganization,
+  CREATABLE_ROLES,
+} from "../middleware/authMiddleware.js";
 
 const ACCESS_TOKEN_TTL = "15m";
 const REFRESH_TOKEN_TTL = 14 * 24 * 60 * 60 * 1000; // 14 days
@@ -63,13 +70,6 @@ const validateSignUpInput = ({
     return "title, role và organization phải là ID hợp lệ";
   }
   return null;
-};
-
-// Which roles each creator role may create (spec section 3).
-// Nobody may create SYSTEM_ADMIN through the API.
-const CREATABLE_ROLES = {
-  SYSTEM_ADMIN: ["ADMIN", "USER"],
-  ADMIN: ["USER"],
 };
 
 // Generate an opaque random refresh token
@@ -263,6 +263,9 @@ export const signIn = async (req, res) => {
       refreshToken,
       new Date(Date.now() + REFRESH_TOKEN_TTL),
     ]);
+
+    // Only real sign-ins count; token refreshes do not update last_login
+    await setUserLastLogin(user.id);
 
     // Send refresh token in HttpOnly cookie
     res.cookie("refreshToken", refreshToken, getCookieOptions());
