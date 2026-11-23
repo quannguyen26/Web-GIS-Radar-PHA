@@ -1,13 +1,21 @@
 import React from "react";
 import { useState } from "react";
 import { dropdownConfigs } from "../../lib/config/dropdownConfigs";
-import { buttonNavItems } from "../../lib/config/navItems";
+import { NavLink } from "react-router-dom";
+import { buttonNavItems, adminNavItems } from "../../lib/config/navItems";
 import { ChevronDown, Check } from "lucide-react";
 import { useSelection } from "../../context/SelectionContext";
+import { useAuth } from "../../context/AuthContext";
 
 const Navigation = ({ isSidebarOpen, isMobileMenuOpen }) => {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const { selections, setSelections } = useSelection();
+  const { user } = useAuth();
+
+  // Keep only the admin items the current role may see (guests see none)
+  const visibleAdminItems = adminNavItems.filter((item) =>
+    item.allowedRoles.includes(user?.roleCode),
+  );
 
   return (
     <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -133,6 +141,49 @@ const Navigation = ({ isSidebarOpen, isMobileMenuOpen }) => {
             </div>
           );
         })}
+
+        {/* Admin section: rendered only when at least one item is visible */}
+        {visibleAdminItems.length > 0 && (
+          <>
+            <div className="mx-2 h-px bg-gray-100 dark:bg-slate-800/50" />
+
+            <div
+              className={`mb-3 overflow-hidden px-3 whitespace-nowrap transition-all duration-300 ${isSidebarOpen || isMobileMenuOpen ? "block h-5" : "hidden"}`}
+            >
+              <span className="text-[11px] font-bold tracking-[0.2em] text-gray-400 uppercase dark:text-slate-500">
+                Quản trị
+              </span>
+            </div>
+
+            {visibleAdminItems.map((item) => {
+              const showText = isSidebarOpen || isMobileMenuOpen;
+              const Icon = item.icon;
+              return (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  title={item.name}
+                  className={({ isActive }) =>
+                    `flex w-full items-center rounded-lg transition-all ${showText ? "p-3" : "justify-center p-2"} ${
+                      isActive
+                        ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:bg-indigo-500/10 dark:text-indigo-400 dark:shadow-none"
+                        : "text-gray-500 hover:bg-gray-50 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                    }`
+                  }
+                >
+                  <span className="shrink-0">
+                    <Icon size={22} />
+                  </span>
+                  <span
+                    className={`ml-7 overflow-hidden text-left text-xs font-medium whitespace-nowrap transition-all duration-300 ${showText ? "w-full" : "hidden"}`}
+                  >
+                    {item.name}
+                  </span>
+                </NavLink>
+              );
+            })}
+          </>
+        )}
       </div>
     </nav>
   );
