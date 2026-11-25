@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import {
   findUserByUsername,
+  isTitleAllowedForOrganization,
   setUserLastLogin,
   toUserDTO,
 } from "../services/userService.js";
@@ -139,6 +140,14 @@ export const signUp = async (req, res) => {
       return res.status(403).json({
         message: "Bạn chỉ được tạo tài khoản trong đơn vị của mình",
       });
+    }
+
+    // Title must fit the organization type (sql/002): radar station → QTV,
+    // provincial station → DBV
+    if ((await isTitleAllowedForOrganization(title, organization)) === false) {
+      return res
+        .status(400)
+        .json({ message: "Chức danh không phù hợp với loại đơn vị" });
     }
 
     // Check if username already exists

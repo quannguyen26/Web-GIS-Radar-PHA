@@ -21,6 +21,27 @@ const EMPTY_FORM = {
   organization: "",
 };
 
+// Titles that fit the chosen organization: a title whose organizationType is
+// null fits every type (same rule as the backend, sql/002)
+const titlesForOrganization = (lookups, organizationId) => {
+  const organization = lookups?.organizations.find(
+    (o) => String(o.id) === String(organizationId),
+  );
+  if (!organization) return [];
+  return lookups.titles.filter(
+    (t) =>
+      !t.organizationType ||
+      t.organizationType === organization.organizationType,
+  );
+};
+
+// Keep the current title if it still fits, otherwise pick the only choice
+// (radar station → Quan trắc viên, provincial station → Dự báo viên)
+const pickTitle = (titles, currentTitle) => {
+  if (titles.some((t) => String(t.id) === currentTitle)) return currentTitle;
+  return titles.length === 1 ? String(titles[0].id) : "";
+};
+
 // Fill the form from an existing user (edit mode). Select values are strings.
 const formFromUser = (user) => ({
   ...EMPTY_FORM,
@@ -91,15 +112,23 @@ const UserFormDialog = ({ user = null, onClose, onSaved }) => {
         const data = res.data;
         setLookups(data);
         // Preselect when there is only one choice (e.g. ADMIN: role USER,
-        // own organization)
-        setForm((prev) => ({
-          ...prev,
-          role: data.roles.length === 1 ? String(data.roles[0].id) : prev.role,
-          organization:
+        // own organization, and then the title of that organization type)
+        setForm((prev) => {
+          const organization =
             data.organizations.length === 1
               ? String(data.organizations[0].id)
-              : prev.organization,
-        }));
+              : prev.organization;
+          return {
+            ...prev,
+            role:
+              data.roles.length === 1 ? String(data.roles[0].id) : prev.role,
+            organization,
+            title: pickTitle(
+              titlesForOrganization(data, organization),
+              prev.title,
+            ),
+          };
+        });
       } catch (error) {
         if (!isCancelled) {
           setErrorMsg(
@@ -118,8 +147,21 @@ const UserFormDialog = ({ user = null, onClose, onSaved }) => {
   // One handler for every field, thanks to the input's name attribute
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setForm((prev) => {
+      const next = { ...prev, [name]: value };
+      // A new organization may change which titles are allowed
+      if (name === "organization") {
+        next.title = pickTitle(
+          titlesForOrganization(lookups, value),
+          prev.title,
+        );
+      }
+      return next;
+    });
   };
+
+  // Title choices depend on the selected organization
+  const titleOptions = titlesForOrganization(lookups, form.organization);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -282,6 +324,28 @@ const UserFormDialog = ({ user = null, onClose, onSaved }) => {
             />
           </div>
 
+          {/* Organization first: it decides which titles are allowed */}
+          <div className="sm:col-span-2">
+            <label htmlFor="uf-organization" className={labelClass}>
+              Đơn vị *
+            </label>
+            <select
+              id="uf-organization"
+              name="organization"
+              value={form.organization}
+              onChange={handleChange}
+              disabled={isDisabled || (isEdit && !canChangeRoleAndOrg)}
+              className={inputClass}
+            >
+              <option value="">-- Chọn --</option>
+              {lookups?.organizations.map((o) => (
+                <option key={o.id} value={o.id}>
+                  {o.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div>
             <label htmlFor="uf-title" className={labelClass}>
               Chức danh *
@@ -291,11 +355,13 @@ const UserFormDialog = ({ user = null, onClose, onSaved }) => {
               name="title"
               value={form.title}
               onChange={handleChange}
-              disabled={isDisabled}
+              disabled={isDisabled || !form.organization}
               className={inputClass}
             >
-              <option value="">-- Chọn --</option>
-              {lookups?.titles.map((t) => (
+              <option value="">
+                {form.organization ? "-- Chọn --" : "-- Chọn đơn vị trước --"}
+              </option>
+              {titleOptions.map((t) => (
                 <option key={t.id} value={t.id}>
                   {t.name}
                 </option>
@@ -319,27 +385,6 @@ const UserFormDialog = ({ user = null, onClose, onSaved }) => {
               {lookups?.roles.map((r) => (
                 <option key={r.id} value={r.id}>
                   {r.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="sm:col-span-2">
-            <label htmlFor="uf-organization" className={labelClass}>
-              Đơn vị *
-            </label>
-            <select
-              id="uf-organization"
-              name="organization"
-              value={form.organization}
-              onChange={handleChange}
-              disabled={isDisabled || (isEdit && !canChangeRoleAndOrg)}
-              className={inputClass}
-            >
-              <option value="">-- Chọn --</option>
-              {lookups?.organizations.map((o) => (
-                <option key={o.id} value={o.id}>
-                  {o.name}
                 </option>
               ))}
             </select>

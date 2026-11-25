@@ -95,6 +95,26 @@ export const setUserPasswordHash = async (id, passwordHash) => {
   );
 };
 
+/**
+ * Does the title fit the organization's type (titles.organization_type,
+ * NULL = fits every type)? Returns true / false, or null when the title or
+ * the organization does not exist (the insert/update then fails on the
+ * foreign key and the controller answers 400).
+ */
+export const isTitleAllowedForOrganization = async (
+  titleId,
+  organizationId,
+) => {
+  const result = await poolApp.query(
+    `SELECT (t.organization_type IS NULL
+             OR t.organization_type = o.organization_type) AS allowed
+     FROM titles t, organizations o
+     WHERE t.id = $1 AND o.id = $2`,
+    [titleId, organizationId],
+  );
+  return result.rows[0]?.allowed ?? null;
+};
+
 /** Record a successful sign-in (shown as "Đăng nhập gần nhất" to admins). */
 export const setUserLastLogin = async (id) => {
   await poolApp.query(

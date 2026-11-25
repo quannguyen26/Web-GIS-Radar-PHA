@@ -3,6 +3,7 @@ import {
   deleteUserSessions,
   findRoleCodeById,
   findUserById,
+  isTitleAllowedForOrganization,
   listUsers as listUsersFromDb,
   setUserActive as setUserActiveInDb,
   setUserPasswordHash,
@@ -237,6 +238,25 @@ export const updateUser = async (req, res) => {
       return res
         .status(400)
         .json({ message: "Không có thông tin nào để cập nhật" });
+    }
+
+    // Title must fit the organization type (sql/002). Check the pair as it
+    // will be AFTER the update, so changing only the organization is caught.
+    if ("title_id" in fields || "organization_id" in fields) {
+      const finalTitleId = fields.title_id ?? target.title_id;
+      const finalOrganizationId =
+        fields.organization_id ?? target.organization_id;
+      if (
+        finalOrganizationId != null &&
+        (await isTitleAllowedForOrganization(
+          finalTitleId,
+          finalOrganizationId,
+        )) === false
+      ) {
+        return res
+          .status(400)
+          .json({ message: "Chức danh không phù hợp với loại đơn vị" });
+      }
     }
 
     await updateUserFields(target.id, fields);

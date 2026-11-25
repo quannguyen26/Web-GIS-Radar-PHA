@@ -9,7 +9,8 @@ import { CREATABLE_ROLES } from "../middleware/authMiddleware.js";
 // Options for the user form, already limited to what the caller may choose:
 //   roles         → only roles the caller may create/assign
 //   organizations → SYSTEM_ADMIN: every active one; ADMIN: only their own
-//   titles        → all
+//   titles        → all, each with the organizationType it fits
+//                   (null = every type), so the form can filter them
 export const getLookups = async (req, res) => {
   try {
     const roleCodes = CREATABLE_ROLES[req.user.roleCode] ?? [];
@@ -24,7 +25,12 @@ export const getLookups = async (req, res) => {
 
     return res.status(200).json({
       roles,
-      titles,
+      titles: titles.map((t) => ({
+        id: t.id,
+        code: t.code,
+        name: t.name,
+        organizationType: t.organization_type,
+      })),
       organizations: organizations.map((o) => ({
         id: o.id,
         code: o.code,

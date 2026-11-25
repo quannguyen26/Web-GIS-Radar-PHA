@@ -6,7 +6,7 @@
 --
 -- RULE: whenever a new table/column/constraint is added (in a numbered file
 -- 001, 002, ...), the same change is ALSO written here, so this file always
--- matches the latest structure. Last synced with: 001 (2026-11-18).
+-- matches the latest structure. Last synced with: 002 (2026-11-25).
 --
 -- Which file to run?
 --   * Brand-new empty database  -> run ONLY this file (it already contains
@@ -48,7 +48,12 @@ CREATE TABLE titles (
   id          serial       PRIMARY KEY,
   code        varchar(50)  NOT NULL UNIQUE,
   name        varchar(100) NOT NULL,
-  description text
+  description text,
+  -- Added in 002: the only organization type this title fits
+  -- (NULL = every type). Checked by the backend when saving a user.
+  organization_type varchar(50)
+    CONSTRAINT chk_titles_organization_type
+    CHECK (organization_type IN ('RADAR_STATION', 'PROVINCIAL_STATION'))
 );
 
 -- ===== organizations: radar station / provincial station ====================
@@ -131,9 +136,9 @@ INSERT INTO roles (id, code, name, description) VALUES
   (2, 'ADMIN',        'Admin',        'Quản trị người dùng và bản tin'),
   (3, 'USER',         'User',         'Người tạo và quản lý bản tin');
 
-INSERT INTO titles (id, code, name, description) VALUES
-  (1, 'QTV', 'Observer',   'Quan trắc viên'),
-  (2, 'DBV', 'Forecaster', 'Dự báo viên');
+INSERT INTO titles (id, code, name, description, organization_type) VALUES
+  (1, 'QTV', 'Quan trắc viên', 'Observer',   'RADAR_STATION'),
+  (2, 'DBV', 'Dự báo viên',    'Forecaster', 'PROVINCIAL_STATION');
 
 INSERT INTO organizations
   (id, code, name, organization_type, province, file_code, doc_symbol, place_name)

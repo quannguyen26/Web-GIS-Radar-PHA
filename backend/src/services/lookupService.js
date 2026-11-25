@@ -9,10 +9,10 @@ export const listRolesByCodes = async (codes) => {
   return result.rows;
 };
 
-/** Every title (QTV, DBV, ...). */
+/** Every title (QTV, DBV, ...) with the organization type it fits. */
 export const listTitles = async () => {
   const result = await poolApp.query(
-    "SELECT id, code, name FROM titles ORDER BY id",
+    "SELECT id, code, name, organization_type FROM titles ORDER BY id",
   );
   return result.rows;
 };
