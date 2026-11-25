@@ -11,7 +11,7 @@ import CenterUpdater from "./CenterUpdate";
 import WFSLayer from "./WFSLayer";
 import MapTooltipCleaner from "./MapTooltipCleaner";
 import LayerControlToggle from "../ui/LayerControlToggle";
-import MapPanes from "./MapPanes";
+import MapPanes from "../ui/MapPanes";
 import { LayerToggleProvider } from "../../context/LayerToggleContext";
 
 const MapView = () => {

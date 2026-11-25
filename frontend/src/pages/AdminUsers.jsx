@@ -144,7 +144,8 @@ const AdminUsers = () => {
       : currentUser?.organizationName || "";
 
   return (
-    <div className="min-h-screen w-full bg-slate-50 px-4 py-8 text-slate-800 md:px-8 dark:bg-[#0f172a] dark:text-slate-200">
+    // No min-h-screen: ContentPanel already covers the map area
+    <div className="w-full bg-slate-50 px-4 py-8 text-slate-800 md:px-8 dark:bg-[#0f172a] dark:text-slate-200">
       <div className="mx-auto max-w-6xl">
         <Link
           to="/"

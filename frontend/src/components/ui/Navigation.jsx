@@ -7,6 +7,14 @@ import { ChevronDown, Check } from "lucide-react";
 import { useSelection } from "../../context/SelectionContext";
 import { useAuth } from "../../context/AuthContext";
 
+// Classes shared by every tool / admin menu item
+const navItemClass = (isActive, showText) =>
+  `flex w-full items-center rounded-lg transition-all ${showText ? "p-3" : "justify-center p-2"} ${
+    isActive
+      ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:bg-indigo-500/10 dark:text-indigo-400 dark:shadow-none"
+      : "text-gray-500 hover:bg-gray-50 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+  }`;
+
 const Navigation = ({ isSidebarOpen, isMobileMenuOpen }) => {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const { selections, setSelections } = useSelection();
@@ -118,26 +126,43 @@ const Navigation = ({ isSidebarOpen, isMobileMenuOpen }) => {
         </div>
 
         {/* Tooths Items */}
-        {buttonNavItems.map((item, idx) => {
+        {buttonNavItems.map((item) => {
           const showText = isSidebarOpen || isMobileMenuOpen;
           const Icon = item.icon;
-          return (
-            <div key={idx} className="group relative">
-              <button
-                className={`flex w-full items-center rounded-lg transition-all ${showText ? "p-3" : "justify-center p-2"} ${
-                  item.active
-                    ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:bg-indigo-500/10 dark:text-indigo-400 dark:shadow-none"
-                    : "text-gray-500 hover:bg-gray-50 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
-                } `}
+          const content = (
+            <>
+              <span className="shrink-0">
+                <Icon size={22} />
+              </span>
+              {/* Sliding menu label */}
+              <span
+                className={`ml-7 overflow-hidden text-left text-xs font-medium whitespace-nowrap transition-all duration-300 ${showText ? "w-full" : "hidden"}`}
               >
-                <span className="shrink-0">{<Icon size={22} />}</span>
-                {/* Hiệu ứng trượt cho menu label */}
-                <span
-                  className={`ml-7 overflow-hidden text-left text-xs font-medium whitespace-nowrap transition-all duration-300 ${showText ? "w-full" : "hidden"}`}
+                {item.name}
+              </span>
+            </>
+          );
+          return (
+            <div key={item.name} className="group relative">
+              {item.path ? (
+                // end: "/" is active only on the map itself, not on /admin/...
+                <NavLink
+                  to={item.path}
+                  end
+                  title={item.name}
+                  className={({ isActive }) => navItemClass(isActive, showText)}
                 >
-                  {item.name}
-                </span>
-              </button>
+                  {content}
+                </NavLink>
+              ) : (
+                <button
+                  type="button"
+                  title={item.name}
+                  className={navItemClass(false, showText)}
+                >
+                  {content}
+                </button>
+              )}
             </div>
           );
         })}
@@ -163,13 +188,7 @@ const Navigation = ({ isSidebarOpen, isMobileMenuOpen }) => {
                   key={item.path}
                   to={item.path}
                   title={item.name}
-                  className={({ isActive }) =>
-                    `flex w-full items-center rounded-lg transition-all ${showText ? "p-3" : "justify-center p-2"} ${
-                      isActive
-                        ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:bg-indigo-500/10 dark:text-indigo-400 dark:shadow-none"
-                        : "text-gray-500 hover:bg-gray-50 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
-                    }`
-                  }
+                  className={({ isActive }) => navItemClass(isActive, showText)}
                 >
                   <span className="shrink-0">
                     <Icon size={22} />

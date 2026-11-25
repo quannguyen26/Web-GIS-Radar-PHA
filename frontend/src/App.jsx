@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import AdminUsers from "./pages/AdminUsers";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import ContentPanel from "./components/layout/ContentPanel";
 import { ADMIN_ROLES } from "./lib/config/navItems";
 
 function App() {
@@ -12,15 +13,19 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          {/* Login is a modal nested in the dashboard route, so the map stays
-              mounted when moving between "/" and "/login" */}
+          {/* Everything nested in "/" keeps the dashboard (and the map)
+              mounted, so moving between these pages never reloads the map */}
           <Route path="/" element={<DashBoard />}>
+            {/* Login: a modal over the dashboard */}
             <Route path="login" element={<Login />} />
-          </Route>
 
-          {/* Admin area: every nested route requires an admin role */}
-          <Route element={<ProtectedRoute allowedRoles={ADMIN_ROLES} />}>
-            <Route path="/admin/users" element={<AdminUsers />} />
+            {/* Full pages drawn over the map area */}
+            <Route element={<ContentPanel />}>
+              {/* Admin area: every nested route requires an admin role */}
+              <Route element={<ProtectedRoute allowedRoles={ADMIN_ROLES} />}>
+                <Route path="admin/users" element={<AdminUsers />} />
+              </Route>
+            </Route>
           </Route>
 
           <Route path="*" element={<NotFound />} />

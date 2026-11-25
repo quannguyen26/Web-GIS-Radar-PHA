@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { AlertCircle, Loader2, X } from "lucide-react";
+import { createPortal } from "react-dom";
 import api from "../../lib/api";
 
 // Same limits as resetUserPassword() in the backend userController
@@ -49,9 +50,12 @@ const ResetPasswordDialog = ({ user, onClose, onSaved }) => {
     }
   };
 
-  return (
+  // Rendered into <body> (portal): the admin page sits inside the map area,
+  // whose stacking context would otherwise keep the overlay below the
+  // header and sidebar.
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-1200 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-labelledby="reset-password-title"
@@ -135,7 +139,8 @@ const ResetPasswordDialog = ({ user, onClose, onSaved }) => {
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 };
 

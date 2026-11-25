@@ -1,13 +1,11 @@
 import { MousePointerClick, Newspaper, Settings, Users } from "lucide-react";
 
+// Items with a path are links (highlighted while that page is open);
+// items without one are not built yet.
 export const buttonNavItems = [
-  {
-    name: "Bản đồ",
-    icon: MousePointerClick,
-    active: true,
-  },
-  { name: "Bản tin", icon: Newspaper, active: false },
-  { name: "Trạng thái hệ thống", icon: Settings, active: false },
+  { name: "Bản đồ", icon: MousePointerClick, path: "/" },
+  { name: "Bản tin", icon: Newspaper },
+  { name: "Trạng thái hệ thống", icon: Settings },
 ];
 
 // Role codes allowed into the admin area (must match roles.code in the DB)

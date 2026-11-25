@@ -14,7 +14,8 @@ const ProtectedRoute = ({ allowedRoles }) => {
   // user would be sent to /login before /auth/refresh finishes
   if (isLoading) {
     return (
-      <div className="flex min-h-screen w-full items-center justify-center bg-slate-50 dark:bg-[#0f172a]">
+      // h-full: fills the panel over the map (ContentPanel), not the screen
+      <div className="flex h-full w-full items-center justify-center bg-slate-50 dark:bg-[#0f172a]">
         <Loader2
           size={32}
           className="animate-spin text-indigo-500"

@@ -6,7 +6,8 @@ import LogoImg from "../assets/LogoImg.png";
 // Shown when a logged-in user opens a page their role may not access
 const Forbidden = () => {
   return (
-    <div className="relative flex min-h-screen w-full items-center justify-center bg-slate-50 px-4 py-12 transition-colors dark:bg-[#0f172a]">
+    // min-h-full: fills the panel over the map (ContentPanel)
+    <div className="relative flex min-h-full w-full items-center justify-center bg-slate-50 px-4 py-12 transition-colors dark:bg-[#0f172a]">
       <div className="relative w-full max-w-md">
         <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-xl transition-all dark:border-slate-800 dark:bg-[#1e293b]">
           <img
