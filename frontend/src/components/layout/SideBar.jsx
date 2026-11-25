@@ -6,7 +6,7 @@ import Logo from "../ui/Logo";
 import { useAuth } from "../../context/AuthContext";
 
 const SideBar = ({ isSidebarOpen, isMobileMenuOpen, setIsMobileMenuOpen }) => {
-  const { user, isLoading, isAuthenticated, logout } = useAuth();
+  const {isLoading, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleAuthAction = () => {
@@ -20,16 +20,16 @@ const SideBar = ({ isSidebarOpen, isMobileMenuOpen, setIsMobileMenuOpen }) => {
   const isExpanded = isSidebarOpen || isMobileMenuOpen;
 
   // Extract display initials from full name or username
-  const displayName = user?.fullName || user?.username || "Người dùng";
-  const displayRole =
-    user?.roleName || user?.titleName || user?.organizationName || "Thành viên";
-  const userInitial = displayName.trim().charAt(0).toUpperCase();
+  // const displayName = user?.fullName || user?.username || "Người dùng";
+  // const displayRole =
+  //   user?.roleName || user?.titleName || user?.organizationName || "Thành viên";
+  // const userInitial = displayName.trim().charAt(0).toUpperCase();
 
   return (
     <>
       {isMobileMenuOpen && (
         <div
-          className="animate-in fade-in fixed inset-0 z-45 bg-black/60 backdrop-blur-sm transition-opacity duration-300 md:hidden"
+          className="fixed inset-0 transition-opacity duration-300 animate-in fade-in z-45 bg-black/60 backdrop-blur-sm md:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
@@ -60,7 +60,7 @@ const SideBar = ({ isSidebarOpen, isMobileMenuOpen, setIsMobileMenuOpen }) => {
         <div className="border-t border-gray-100 bg-white p-3 dark:border-slate-800 dark:bg-[#1e293b]">
           {isLoading ? (
             <div
-              className="h-11 w-full animate-pulse rounded-xl bg-slate-100 dark:bg-slate-800"
+              className="w-full h-11 animate-pulse rounded-xl bg-slate-100 dark:bg-slate-800"
               aria-hidden="true"
             />
           ) : isAuthenticated ? (
@@ -72,13 +72,13 @@ const SideBar = ({ isSidebarOpen, isMobileMenuOpen, setIsMobileMenuOpen }) => {
                 }`}
                 title={`${displayName} (${displayRole})`}
               >
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-600 font-bold text-white shadow-sm">
+                <div className="flex items-center justify-center font-bold text-white bg-indigo-600 rounded-lg shadow-sm h-9 w-9 shrink-0">
                   {userInitial}
                 </div>
 
                 {isExpanded && (
-                  <div className="min-w-0 flex-1 overflow-hidden">
-                    <p className="truncate text-xs font-semibold text-slate-800 dark:text-slate-100">
+                  <div className="flex-1 min-w-0 overflow-hidden">
+                    <p className="text-xs font-semibold truncate text-slate-800 dark:text-slate-100">
                       {displayName}
                     </p>
                     <p className="truncate text-[11px] text-slate-400 dark:text-slate-500">
