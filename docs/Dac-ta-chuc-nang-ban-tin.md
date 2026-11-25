@@ -36,7 +36,7 @@ Nguồn: README, hai mẫu bản tin docx, mã nguồn hiện tại và các câ
 | Thời gian | Định dạng 24h. Giờ ảnh: phút tròn chục. Giờ phát tin: phút theo bước 5 (00, 05, 10, …, 55); tự điền mốc 5 phút kế tiếp, người soạn sửa được, nhưng vẫn phải theo bước 5 và sau giờ ảnh (đổi ngày 18/11/2026, trước đó là tròn chục) |
 | Bản nháp | Người soạn xóa được bản nháp của mình (có hộp xác nhận) |
 | Tên file | `<mã 4 ký tự>_<DONG hoặc MLDR>_<yyyymmdd>_<hh>h<mm>`, ngày 8 ký tự; phút `<mm>` theo bước 5 như giờ phát tin |
-| Hướng di chuyển {12} | 32 hướng, chọn trên vòng tròn la bàn |
+| Hướng di chuyển {12} | 16 hướng chính của hoa gió khí tượng, chọn trên vòng tròn la bàn; chọn hướng vùng mây đi tới (đổi từ 32 hướng, 25/11/2026) |
 | Lựa chọn có sẵn ({5}, {20}, {23}) | Chọn hoặc gõ tay; câu gõ tay không lưu lại thành lựa chọn |
 | Xã/phường | Lấy từ lớp `radar:all_new_meger_sub_district`, địa giới sau sáp nhập 2025, 16 tỉnh từ Thanh Hóa trở ra |
 | Ảnh ra đa | Dán, tải lên, hoặc chụp bản đồ web đang hiển thị; cả ba đều cắt được |
@@ -102,7 +102,7 @@ Form nhập và việc kiểm tra dữ liệu đều sinh ra từ bản mô tả
 | {9} | Tỉnh có mưa dông | Chọn nhiều trong 16 tỉnh |
 | {10} | Zmax (dBZ) | Số, 30–65 |
 | {11} | Tỉnh có Zmax | Chọn 1–3 tỉnh |
-| {12} | Hướng di chuyển | Vòng tròn la bàn 32 hướng |
+| {12} | Hướng di chuyển | Vòng tròn la bàn 16 hướng (xem bên dưới) |
 | {13}, {14} | Tốc độ (km/h) | 5–50, min ≤ max |
 | {15}–{19} | Giờ và ngày của ảnh | Tự điền khi chụp từ web; nhập tay khi dán hoặc tải ảnh |
 | {20} | Nhận định 1–3 giờ tới | Chọn câu có sẵn hoặc gõ tay |
@@ -111,6 +111,39 @@ Form nhập và việc kiểm tra dữ liệu đều sinh ra từ bản mô tả
 | {24}, {25} | Giờ phát tin | Tự điền, sửa được; phút theo bước 5, phải sau giờ ảnh |
 | {26}, {27} | Chữ ký, họ tên | Lấy từ tài khoản |
 | {28} | Ảnh ra đa | Dán, tải lên hoặc chụp bản đồ |
+
+### Hướng di chuyển {12} (chốt 25/11/2026, bước 2.1)
+
+Dùng 16 hướng chính của hoa gió khí tượng, mỗi hướng cách nhau 22,5°. Người soạn bấm vào **hướng vùng mây đang đi tới** (mây đi về phía Đông Nam thì bấm Đông Nam), bản tin in "di chuyển theo hướng Đông Nam". Mã lưu trong dữ liệu là mã tiếng Anh.
+
+| Góc | Mã | Tên in trong bản tin |
+|---|---|---|
+| 0° | N | Bắc |
+| 22,5° | NNE | Bắc Đông Bắc |
+| 45° | NE | Đông Bắc |
+| 67,5° | ENE | Đông Đông Bắc |
+| 90° | E | Đông |
+| 112,5° | ESE | Đông Đông Nam |
+| 135° | SE | Đông Nam |
+| 157,5° | SSE | Nam Đông Nam |
+| 180° | S | Nam |
+| 202,5° | SSW | Nam Tây Nam |
+| 225° | SW | Tây Nam |
+| 247,5° | WSW | Tây Tây Nam |
+| 270° | W | Tây |
+| 292,5° | WNW | Tây Tây Bắc |
+| 315° | NW | Tây Bắc |
+| 337,5° | NNW | Bắc Tây Bắc |
+
+### Câu có sẵn {5}, {20}, {23} (chốt 25/11/2026, bước 2.1)
+
+Lấy từ chú giải của file mẫu, đã sửa chính tả. Người soạn chọn một câu hoặc gõ tay; câu gõ tay không lưu thành lựa chọn. Thêm câu sau này chỉ cần sửa bản mô tả trường.
+
+| Trường | Vị trí trong câu | Các lựa chọn (câu đầu là mặc định) |
+|---|---|---|
+| {5} | "BẢN TIN CẢNH BÁO {5} TRÊN KHU VỰC" | MƯA DÔNG · MƯA DÔNG DIỆN RỘNG |
+| {20} | "tiếp tục gây {20} cho các xã/phường" | mưa, mưa rào và dông · mưa, mưa vừa, có nơi mưa to và dông · mưa to và dông |
+| {23} | "Trong cơn dông cần đề phòng {23}." | lốc, sét, gió giật mạnh · lốc, sét, mưa đá và gió giật mạnh |
 
 ### Quy tắc ghép {21} và {22}
 
@@ -213,8 +246,6 @@ Quy tắc dự án: không cài gói khi chưa được duyệt. Tên gói cụ 
 
 ## 11. Việc còn mở
 
-- Danh sách tên 32 hướng bằng tiếng Việt: sẽ đề xuất để chủ dự án duyệt.
 - Lớp `radar:all_new_meger_sub_district` có thuộc tính tên tỉnh để nhóm xã theo tỉnh hay không: kiểm tra khi triển khai.
-- Danh sách câu có sẵn đầy đủ cho {5}, {20}, {23}.
 - CORS của GeoServer và nền ArcGIS cho chức năng chụp bản đồ.
 - Triển khai production (Nginx, nơi lưu file) chưa rõ.

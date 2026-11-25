@@ -45,7 +45,7 @@ Cập nhật: 19/11/2026. Dùng để tiếp tục công việc ở phiên mới
 - Khách chỉ xem nội dung bản tin đã ban hành; tải docx/pdf phải đăng nhập (file có chữ ký). Mobile chỉ xem.
 - Số bản tin đếm chung cả đơn vị, reset 1/1, cấp lúc ban hành, Admin đơn vị đặt số khởi đầu.
 - Một đoạn, một ảnh. Ảnh: dán, tải lên, hoặc chụp bản đồ web đang hiển thị rồi cắt.
-- Hướng di chuyển 32 hướng, chọn trên vòng la bàn. Giờ ảnh phút tròn chục; giờ phát tin và phút trong tên file theo bước 5 (đổi 18/11/2026). Ngày trong tên file 8 ký tự.
+- Hướng di chuyển 16 hướng chính, chọn trên vòng la bàn, hướng vùng mây đi tới (đổi từ 32, 25/11/2026). Giờ ảnh phút tròn chục; giờ phát tin và phút trong tên file theo bước 5 (đổi 18/11/2026). Ngày trong tên file 8 ký tự.
 - Xã/phường lấy từ lớp `radar:all_new_meger_sub_district`; tỉnh chọn đủ xã thì ghi "các xã phường thuộc tỉnh ...".
 - Gmail riêng từng đơn vị (mật khẩu ứng dụng, lưu mã hóa), danh sách nhận do Admin đơn vị sửa, chỉ đính kèm pdf. Gửi lỗi thì bản tin vẫn ban hành, có nút gửi lại.
 - Chữ ký là ảnh PNG theo tài khoản; chưa có thì không ban hành được.
@@ -97,7 +97,7 @@ Chủ dự án cho biết các bảng này chưa hoàn thiện, cần bổ sung.
 ## 7. Đang chờ chủ dự án
 
 1. Cho phép cài gói (sẽ nêu tên từng gói trước khi cài).
-2. Chuẩn bị: file docx mẫu bản sạch không có chú giải, LibreOffice trên máy dev (cả 2 máy), danh sách câu có sẵn cho {20} và {23}, ảnh chữ ký mẫu, Gmail của trạm kèm mật khẩu ứng dụng và danh sách người nhận.
+2. Chuẩn bị: file docx mẫu bản sạch không có chú giải, LibreOffice trên máy dev (cả 2 máy), ảnh chữ ký mẫu, Gmail của trạm kèm mật khẩu ứng dụng và danh sách người nhận.
 3. **Máy nhà:** kiểm tra `DB_HOST` trong `backend/.env`.
    - Nếu là DB local riêng: chạy `backend/sql/001_ban_tin_users_organizations.sql` vào `webgis_app`.
    - Nếu cũng trỏ vào DB production: **không chạy lại**, vì 001 đã được áp dụng.
@@ -106,7 +106,6 @@ Chủ dự án cho biết các bảng này chưa hoàn thiện, cần bổ sung.
 
 ## 8. Việc còn mở về kỹ thuật
 
-- Danh sách tên 32 hướng tiếng Việt: cần đề xuất để duyệt.
 - Lớp gộp xã có thuộc tính tên tỉnh hay không: chưa kiểm tra.
 - CORS của GeoServer và nền ArcGIS cho chức năng chụp bản đồ: chưa kiểm tra; phương án thay thế là chụp tab của trình duyệt.
 - Triển khai production (Nginx, nơi lưu file): chưa rõ.
