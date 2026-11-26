@@ -1,0 +1,249 @@
+{
+  "templateCode": "RADAR_STATION_STORM",
+  "name": "Bản tin cảnh báo mưa dông - Trạm ra đa",
+  "organizationType": "RADAR_STATION",
+  "version": 1,
+  "fields": [
+    {
+      "placeholder": 1,
+      "key": "bulletinNumber",
+      "label": "Số bản tin",
+      "type": "number",
+      "autoFill": "issue.number"
+    },
+    {
+      "placeholders": { "day": 2, "month": 3, "year": 4 },
+      "key": "issueDate",
+      "label": "Ngày ban hành",
+      "type": "date",
+      "autoFill": "issue.date"
+    },
+    {
+      "placeholder": 5,
+      "key": "title",
+      "label": "Tiêu đề",
+      "type": "select",
+      "required": true,
+      "allowCustom": true,
+      "default": "MƯA DÔNG",
+      "options": [
+        { "value": "MƯA DÔNG", "label": "MƯA DÔNG" },
+        { "value": "MƯA DÔNG DIỆN RỘNG", "label": "MƯA DÔNG DIỆN RỘNG" }
+      ]
+    },
+    {
+      "placeholders": { "hour": 6, "minute": 7 },
+      "key": "observationTime",
+      "label": "Giờ quan trắc",
+      "type": "time",
+      "autoFill": "field.imageTime"
+    },
+    {
+      "placeholder": 8,
+      "key": "intro",
+      "label": "Lời dẫn",
+      "type": "text",
+      "multiline": true,
+      "required": false,
+      "default": ""
+    },
+    {
+      "placeholder": 9,
+      "key": "provinces",
+      "label": "Tỉnh có mưa dông",
+      "type": "multiselect",
+      "required": true,
+      "minItems": 1,
+      "options": [
+        { "value": "Điện Biên", "label": "Điện Biên" },
+        { "value": "Lai Châu", "label": "Lai Châu" },
+        { "value": "Sơn La", "label": "Sơn La" },
+        { "value": "Lào Cai", "label": "Lào Cai" },
+        { "value": "Tuyên Quang", "label": "Tuyên Quang" },
+        { "value": "Cao Bằng", "label": "Cao Bằng" },
+        { "value": "Lạng Sơn", "label": "Lạng Sơn" },
+        { "value": "Thái Nguyên", "label": "Thái Nguyên" },
+        { "value": "Phú Thọ", "label": "Phú Thọ" },
+        { "value": "Bắc Ninh", "label": "Bắc Ninh" },
+        { "value": "Quảng Ninh", "label": "Quảng Ninh" },
+        { "value": "Hà Nội", "label": "Hà Nội" },
+        { "value": "Hải Phòng", "label": "Hải Phòng" },
+        { "value": "Hưng Yên", "label": "Hưng Yên" },
+        { "value": "Ninh Bình", "label": "Ninh Bình" },
+        { "value": "Thanh Hóa", "label": "Thanh Hóa" }
+      ]
+    },
+    {
+      "placeholder": 10,
+      "key": "zmax",
+      "label": "Zmax (dBZ)",
+      "type": "number",
+      "required": true,
+      "integer": true,
+      "min": 30,
+      "max": 65
+    },
+    {
+      "placeholder": 11,
+      "key": "zmaxProvinces",
+      "label": "Tỉnh có Zmax",
+      "type": "multiselect",
+      "required": true,
+      "minItems": 1,
+      "maxItems": 3,
+      "optionsFrom": "provinces",
+      "rules": [
+        {
+          "check": "subsetOf",
+          "field": "provinces",
+          "message": "Tỉnh có Zmax phải nằm trong danh sách tỉnh có mưa dông"
+        }
+      ]
+    },
+    {
+      "placeholder": 12,
+      "key": "direction",
+      "label": "Hướng di chuyển",
+      "type": "direction",
+      "required": true,
+      "options": [
+        { "value": "N", "label": "Bắc", "degrees": 0 },
+        { "value": "NNE", "label": "Bắc Đông Bắc", "degrees": 22.5 },
+        { "value": "NE", "label": "Đông Bắc", "degrees": 45 },
+        { "value": "ENE", "label": "Đông Đông Bắc", "degrees": 67.5 },
+        { "value": "E", "label": "Đông", "degrees": 90 },
+        { "value": "ESE", "label": "Đông Đông Nam", "degrees": 112.5 },
+        { "value": "SE", "label": "Đông Nam", "degrees": 135 },
+        { "value": "SSE", "label": "Nam Đông Nam", "degrees": 157.5 },
+        { "value": "S", "label": "Nam", "degrees": 180 },
+        { "value": "SSW", "label": "Nam Tây Nam", "degrees": 202.5 },
+        { "value": "SW", "label": "Tây Nam", "degrees": 225 },
+        { "value": "WSW", "label": "Tây Tây Nam", "degrees": 247.5 },
+        { "value": "W", "label": "Tây", "degrees": 270 },
+        { "value": "WNW", "label": "Tây Tây Bắc", "degrees": 292.5 },
+        { "value": "NW", "label": "Tây Bắc", "degrees": 315 },
+        { "value": "NNW", "label": "Bắc Tây Bắc", "degrees": 337.5 }
+      ]
+    },
+    {
+      "placeholder": 13,
+      "key": "speedMin",
+      "label": "Tốc độ nhỏ nhất (km/h)",
+      "type": "number",
+      "required": true,
+      "integer": true,
+      "min": 5,
+      "max": 50,
+      "rules": [
+        {
+          "check": "lessOrEqual",
+          "field": "speedMax",
+          "message": "Tốc độ nhỏ nhất không được lớn hơn tốc độ lớn nhất"
+        }
+      ]
+    },
+    {
+      "placeholder": 14,
+      "key": "speedMax",
+      "label": "Tốc độ lớn nhất (km/h)",
+      "type": "number",
+      "required": true,
+      "integer": true,
+      "min": 5,
+      "max": 50
+    },
+    {
+      "placeholders": { "hour": 15, "minute": 16, "day": 17, "month": 18, "year": 19 },
+      "key": "imageTime",
+      "label": "Giờ ảnh",
+      "type": "datetime",
+      "required": true,
+      "minuteStep": 10,
+      "autoFill": "image.capturedTime",
+      "editable": true
+    },
+    {
+      "placeholder": 20,
+      "key": "forecast",
+      "label": "Nhận định 1–3 giờ tới",
+      "type": "select",
+      "required": true,
+      "allowCustom": true,
+      "default": "mưa, mưa rào và dông",
+      "options": [
+        { "value": "mưa, mưa rào và dông", "label": "mưa, mưa rào và dông" },
+        {
+          "value": "mưa, mưa vừa, có nơi mưa to và dông",
+          "label": "mưa, mưa vừa, có nơi mưa to và dông"
+        },
+        { "value": "mưa to và dông", "label": "mưa to và dông" }
+      ]
+    },
+    {
+      "placeholders": { "communes": 21, "wholeProvinces": 22 },
+      "key": "warningAreas",
+      "label": "Xã/phường và tỉnh cảnh báo",
+      "type": "communes",
+      "required": true,
+      "layer": "radar:all_new_meger_sub_district",
+      "editable": true
+    },
+    {
+      "placeholder": 23,
+      "key": "hazards",
+      "label": "Hiện tượng cần đề phòng",
+      "type": "select",
+      "required": true,
+      "allowCustom": true,
+      "default": "lốc, sét, gió giật mạnh",
+      "options": [
+        { "value": "lốc, sét, gió giật mạnh", "label": "lốc, sét, gió giật mạnh" },
+        {
+          "value": "lốc, sét, mưa đá và gió giật mạnh",
+          "label": "lốc, sét, mưa đá và gió giật mạnh"
+        }
+      ]
+    },
+    {
+      "placeholders": { "hour": 24, "minute": 25 },
+      "key": "issueTime",
+      "label": "Giờ phát tin",
+      "type": "time",
+      "required": true,
+      "minuteStep": 5,
+      "autoFill": "next5Minutes",
+      "editable": true,
+      "rules": [
+        {
+          "check": "after",
+          "field": "imageTime",
+          "message": "Giờ phát tin phải sau giờ ảnh"
+        }
+      ]
+    },
+    {
+      "placeholder": 26,
+      "key": "signature",
+      "label": "Chữ ký",
+      "type": "signature",
+      "required": true,
+      "autoFill": "user.signature"
+    },
+    {
+      "placeholder": 27,
+      "key": "authorName",
+      "label": "Họ tên người soạn",
+      "type": "text",
+      "autoFill": "user.fullName"
+    },
+    {
+      "placeholder": 28,
+      "key": "radarImage",
+      "label": "Ảnh ra đa",
+      "type": "image",
+      "required": true,
+      "sources": ["paste", "upload", "capture"],
+      "crop": true
+    }
+  ]
+}

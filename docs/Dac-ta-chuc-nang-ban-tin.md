@@ -101,16 +101,18 @@ Form nhập và việc kiểm tra dữ liệu đều sinh ra từ bản mô tả
 | {8} | Lời dẫn | Tùy chọn, mặc định bỏ trống |
 | {9} | Tỉnh có mưa dông | Chọn nhiều trong 16 tỉnh |
 | {10} | Zmax (dBZ) | Số, 30–65 |
-| {11} | Tỉnh có Zmax | Chọn 1–3 tỉnh |
+| {11} | Tỉnh có Zmax | Chọn 1–3 tỉnh, chỉ trong các tỉnh đã chọn ở {9} |
 | {12} | Hướng di chuyển | Vòng tròn la bàn 16 hướng (xem bên dưới) |
 | {13}, {14} | Tốc độ (km/h) | 5–50, min ≤ max |
 | {15}–{19} | Giờ và ngày của ảnh | Tự điền khi chụp từ web; nhập tay khi dán hoặc tải ảnh |
 | {20} | Nhận định 1–3 giờ tới | Chọn câu có sẵn hoặc gõ tay |
 | {21}, {22} | Xã/phường và tỉnh cảnh báo | Chọn trên bản đồ hoặc tìm theo tên; hệ thống tự ghép câu, sửa tay được |
 | {23} | Hiện tượng cần đề phòng | Chọn câu có sẵn hoặc gõ tay |
-| {24}, {25} | Giờ phát tin | Tự điền, sửa được; phút theo bước 5, phải sau giờ ảnh |
+| {24}, {25} | Giờ phát tin | Tự điền, sửa được; phút theo bước 5, phải sau giờ ảnh. Ngày phát tin là ngày ban hành {2}–{4} |
 | {26}, {27} | Chữ ký, họ tên | Lấy từ tài khoản |
 | {28} | Ảnh ra đa | Dán, tải lên hoặc chụp bản đồ |
+
+Bản mô tả trường (chốt 26/11/2026, bước 2.2): `backend/templates/radar-station/fields.json`. Các trường cùng một giá trị được gộp thành một trường, ví dụ giờ ảnh {15}–{19}. Thứ tự: {2}–{4} là ngày, tháng, năm ban hành; {15}–{19} là giờ, phút, ngày, tháng, năm của ảnh. Danh sách 16 tỉnh của {9} theo địa giới sau sáp nhập 2025, tên phải khớp với lớp xã (kiểm tra ở bước 2.9).
 
 ### Hướng di chuyển {12} (chốt 25/11/2026, bước 2.1)
 
