@@ -46,8 +46,14 @@ Bulletins work happens on branch `feature/ban-tin`.
 Runtime requirements: PostgreSQL with both databases + `backend/.env`. In dev the frontend calls the
 production GeoServer directly.
 
-Dev environment (confirmed by user): the DB in `backend/.env` is a **local** database (writes allowed
-per the rules below). Timeline timestamps come from the local Geo DB; radar images for those
+Dev environment (confirmed by user, 27/11/2026) — the DB in `backend/.env` depends on the machine:
+- **Home PC:** a **dev** database (its `DB_HOST` is not `localhost`). Writes allowed per the rules below.
+- **Office PC:** points straight at the **production** DB (no local PostgreSQL). Never run writes or
+  DDL there: give the SQL to the owner, who backs up and runs it himself, only in `webgis_app`
+  (never the Geo DB).
+- Before any DB write, confirm with the owner which machine this session is on.
+
+Timeline timestamps come from the local Geo DB; radar images for those
 timestamps come from the production GeoServer. The NOTIFY channel must be `radar_product_update`
 (matches `SQL.txt`); check with `pg_get_functiondef('notify_radar_product_update'::regproc)`.
 

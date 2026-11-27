@@ -98,7 +98,7 @@ Chủ dự án cho biết các bảng này chưa hoàn thiện, cần bổ sung.
 1. Cho phép cài gói (sẽ nêu tên từng gói trước khi cài).
 2. Chuẩn bị: file docx mẫu bản sạch không có chú giải, LibreOffice trên máy dev (cả 2 máy), ảnh chữ ký mẫu, Gmail của trạm kèm mật khẩu ứng dụng và danh sách người nhận.
 3. **Máy kia, sau khi `git pull`:** chạy các file SQL máy đó chưa có, theo thứ tự (`002`, `003`), vào `webgis_app`. Sau `003`, từ thư mục `backend` chạy `node scripts/load-template.mjs templates/radar-station/fields.json`; đúng thì in `Loaded RADAR_STATION_STORM v1 (id 1, 19 fields)`. Nếu DB là production thì chủ dự án tự chạy, sao lưu trước.
-4. `CLAUDE.md` ghi "DB trong `.env` là local". Ngày 27/11 chủ dự án xác nhận DB của máy làm việc hôm đó là DB dev, dù `DB_HOST` không phải `localhost`. Cần chủ dự án ghi rõ mỗi máy dùng DB nào, rồi sửa câu này trong `CLAUDE.md`.
+4. Đã rõ (27/11), đã ghi vào `CLAUDE.md`: **máy nhà** dùng DB dev (Claude được chạy SQL); **máy cơ quan** trỏ vào DB production (chủ dự án tự chạy SQL, sao lưu trước, chỉ trong `webgis_app`). Hiện DB dev đã chạy 001, 002, 003 và đã nạp mẫu; DB production đã chạy 001, còn 002 chưa rõ đã chạy chưa, cần kiểm tra.
 5. Trong Project claude.ai: thêm thư mục `docs` vào nguồn GitHub, đổi nhánh đồng bộ sang `feature/ban-tin`, rồi xóa 2 bản cũ `claude/Dac-ta-chuc-nang-ban-tin.md` và `claude/Ban-giao-phien-lam-viec.md`.
 6. Muốn thử ca 404 của API mẫu (bước 2.4): cần một tài khoản thử thuộc SOLA, ghi mật khẩu vào `backend/test-accounts.local`.
 
