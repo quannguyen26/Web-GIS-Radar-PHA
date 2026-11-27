@@ -26,6 +26,10 @@ Bulletins work happens on branch `feature/ban-tin`.
   can be updated.
 - The owner is learning web development: explain each step in simple Vietnamese before doing it,
   work in small pieces, and let the owner review each piece.
+- Code and SQL: write one small piece at a time (about 5–20 lines: one table, one function, one
+  route), show it in chat with a line-by-line explanation in simple Vietnamese, and wait for the
+  owner's approval before writing it to a file or running it. Never batch several pieces into one
+  approval.
 
 ## Commands
 

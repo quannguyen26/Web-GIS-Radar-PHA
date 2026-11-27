@@ -6,7 +6,7 @@
 --
 -- RULE: whenever a new table/column/constraint is added (in a numbered file
 -- 001, 002, ...), the same change is ALSO written here, so this file always
--- matches the latest structure. Last synced with: 002 (2026-11-25).
+-- matches the latest structure. Last synced with: 003 (2026-11-27).
 --
 -- Which file to run?
 --   * Brand-new empty database  -> run ONLY this file (it already contains
@@ -128,6 +128,50 @@ CREATE TABLE sessions (
 );
 CREATE INDEX idx_sessions_user_id ON sessions (user_id);
 
+-- ===== bulletin_templates (added in 003) =====================================
+-- One row per template VERSION; rows are never edited. "fields" is the
+-- "fields" array of backend/templates/<type>/fields.json, loaded with
+-- scripts/load-template.mjs (see the end of this file).
+CREATE TABLE bulletin_templates (
+  id                serial       PRIMARY KEY,
+  code              varchar(50)  NOT NULL,
+  version           integer      NOT NULL
+    CONSTRAINT chk_bulletin_templates_version CHECK (version >= 1),
+  name              varchar(255) NOT NULL,
+  organization_type varchar(50)  NOT NULL
+    CONSTRAINT chk_bulletin_templates_organization_type
+    CHECK (organization_type IN ('RADAR_STATION', 'PROVINCIAL_STATION')),
+  fields            jsonb        NOT NULL
+    CONSTRAINT chk_bulletin_templates_fields CHECK (jsonb_typeof(fields) = 'array'),
+  docx_path         varchar(500),
+  active            boolean      NOT NULL DEFAULT true,
+  created_at        timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT uq_bulletin_templates_code_version UNIQUE (code, version)
+);
+-- At most one active template per organization type
+CREATE UNIQUE INDEX uq_bulletin_templates_active_type
+  ON bulletin_templates (organization_type) WHERE active;
+
+-- ===== bulletins (added in 003; publishing columns come in step 5.1) =========
+CREATE TABLE bulletins (
+  id              bigserial   PRIMARY KEY,
+  template_id     integer     NOT NULL
+    CONSTRAINT fk_bulletins_template REFERENCES bulletin_templates (id),
+  organization_id integer     NOT NULL
+    CONSTRAINT fk_bulletins_organization REFERENCES organizations (id),
+  author_id       bigint      NOT NULL
+    CONSTRAINT fk_bulletins_author REFERENCES users (id),
+  status          varchar(20) NOT NULL DEFAULT 'DRAFT'
+    CONSTRAINT chk_bulletins_status CHECK (status IN ('DRAFT', 'PUBLISHED')),
+  -- Values typed by the author, keyed by the field "key" of the template
+  field_values    jsonb       NOT NULL DEFAULT '{}'
+    CONSTRAINT chk_bulletins_field_values CHECK (jsonb_typeof(field_values) = 'object'),
+  created_at      timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at      timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+-- "My drafts": WHERE author_id = $1 AND status = 'DRAFT'
+CREATE INDEX idx_bulletins_author_status ON bulletins (author_id, status);
+
 -- ===== Lookup data ===========================================================
 -- Ids are written explicitly because the code relies on them
 -- (e.g. role_id = 1 is SYSTEM_ADMIN in chk_users_organization_by_role).
@@ -164,4 +208,11 @@ COMMIT;
 --
 -- INSERT INTO users (username, password_hash, full_name, title_id, role_id, organization_id)
 -- VALUES ('<username>', '<bcrypt hash>', '<full name>', 1, 1, NULL);
+-- =============================================================================
+
+-- =============================================================================
+-- Bulletin templates (after this file, once)
+-- Template rows are loaded from the JSON files in the repo, not written here.
+-- From the backend folder:
+--   node scripts/load-template.mjs templates/radar-station/fields.json
 -- =============================================================================
