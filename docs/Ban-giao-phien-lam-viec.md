@@ -1,6 +1,6 @@
 # Bàn giao phiên làm việc — chức năng Bản tin
 
-Cập nhật: 19/11/2026. Dùng để tiếp tục công việc ở phiên mới, ở bất kỳ máy nào.
+Cập nhật: 27/11/2026. Dùng để tiếp tục công việc ở phiên mới, ở bất kỳ máy nào.
 
 ## 0. Cách dùng file này (đọc trước)
 
@@ -13,17 +13,16 @@ Cập nhật: 19/11/2026. Dùng để tiếp tục công việc ở phiên mới
 
 ## 1. Đang ở đâu
 
-- Đã xong: trao đổi và chốt ý tưởng, viết đặc tả, vẽ thiết kế giao diện, **lập lộ trình 66 bước có theo dõi tiến độ** (xem mục 2).
-- Đã xong (17/11): tạo nhánh `feature/ban-tin`, chuyển đặc tả và file bàn giao vào `docs/`, thêm quy ước làm việc 2 máy vào `CLAUDE.md`.
-- Chưa viết dòng mã chức năng nào, chưa cài gói nào.
-- Đã xong toàn bộ giai đoạn 0 (0.1–0.7, ngày 17–18/11).
-- Đã xong (18/11) bước 1.1, commit `b21aabd`: thư mục `backend/sql/` gồm
-  - `001_ban_tin_users_organizations.sql`: thay đổi cho DB đã có. Đã chạy trên `webgis_app`.
-  - `000_create_webgis_app.sql`: toàn bộ cấu trúc hiện tại cùng dữ liệu danh mục, dùng để tạo lại DB trống. **Quy tắc:** mỗi thay đổi bảng sau này phải có file số mới **và** thêm vào `000` (đã ghi trong `CLAUDE.md`).
-- **Máy cơ quan:** `backend/.env` trỏ thẳng vào **DB production** (máy này không cài PostgreSQL). Chủ dự án cho phép sửa, nhưng **chỉ trong `webgis_app`**; không đụng DB Geo.
-- Chủ dự án vừa làm dự án vừa học lập trình web: mỗi bước cần giải thích trước, làm từng phần nhỏ, để chủ dự án tự viết hoặc duyệt từng đoạn (xem tab "Cách làm mỗi bước" trong lộ trình).
-- Đã xong (18/11): duyệt thiết kế 4 màn hình (bước 0.2). Chốt thêm: xóa nháp có xác nhận; giờ phát tin sửa được, phút theo bước 5 (giờ ảnh vẫn tròn chục).
-- Bước kế tiếp: xem ô "Bước tiếp theo" trên tab Lộ trình (hiện là **1.2**: thêm mã vai trò và loại đơn vị vào access token và `/users/me`). Đọc trạng thái mới nhất trong Sheet trước khi làm. Mỗi bước làm trong một session riêng.
+- Tiến độ (27/11): **21/68 bước**. Xong giai đoạn 0 và giai đoạn 1 (phân quyền, quản lý người dùng; kiểm thử 49/49 ca trong `docs/Kiem-thu-phan-quyen.md`). Giai đoạn 2 đã xong 2.1–2.4. Chi tiết từng bước (commit, cách thử) ở cột Ghi chú của tab Lộ trình.
+- Giai đoạn 2 đã có:
+  - 2.1: 16 hướng và câu có sẵn, ghi trong đặc tả.
+  - 2.2: bản mô tả trường `backend/templates/radar-station/fields.json` (19 trường phủ {1}–{28}).
+  - 2.3: SQL `003_bulletin_templates_and_drafts.sql` (bảng `bulletin_templates`, `bulletins` chỉ có cột nháp), script `backend/scripts/load-template.mjs` nạp `fields.json` vào DB.
+  - 2.4: API `GET /api/bulletin-templates/current` (ADMIN, USER; theo `organizationType` trong token).
+- File SQL trong `backend/sql/`: `000` (tạo DB trống, đã đồng bộ tới 003), `001`, `002`, `003`. Mỗi thay đổi bảng phải có file số mới **và** thêm vào `000`.
+- Cách làm (đã ghi vào `CLAUDE.md` ngày 26/11): mỗi đoạn code hoặc SQL nhỏ (5–20 dòng), giải thích từng dòng, chủ dự án duyệt rồi mới ghi vào file hoặc chạy.
+- Chưa cài gói nào.
+- Bước kế tiếp: **2.5**, API bản nháp (tạo, sửa, xem, danh sách nháp của mình). Xem ô "Bước tiếp theo" trên tab Lộ trình trước khi làm.
 
 ## 2. Tài liệu đã có
 
@@ -98,11 +97,10 @@ Chủ dự án cho biết các bảng này chưa hoàn thiện, cần bổ sung.
 
 1. Cho phép cài gói (sẽ nêu tên từng gói trước khi cài).
 2. Chuẩn bị: file docx mẫu bản sạch không có chú giải, LibreOffice trên máy dev (cả 2 máy), ảnh chữ ký mẫu, Gmail của trạm kèm mật khẩu ứng dụng và danh sách người nhận.
-3. **Máy nhà:** kiểm tra `DB_HOST` trong `backend/.env`.
-   - Nếu là DB local riêng: chạy `backend/sql/001_ban_tin_users_organizations.sql` vào `webgis_app`.
-   - Nếu cũng trỏ vào DB production: **không chạy lại**, vì 001 đã được áp dụng.
-4. `CLAUDE.md` vẫn ghi "DB trong `.env` là local". Điều này không đúng với máy cơ quan; cần chủ dự án quyết định sửa câu này thế nào.
+3. **Máy kia, sau khi `git pull`:** chạy các file SQL máy đó chưa có, theo thứ tự (`002`, `003`), vào `webgis_app`. Sau `003`, từ thư mục `backend` chạy `node scripts/load-template.mjs templates/radar-station/fields.json`; đúng thì in `Loaded RADAR_STATION_STORM v1 (id 1, 19 fields)`. Nếu DB là production thì chủ dự án tự chạy, sao lưu trước.
+4. `CLAUDE.md` ghi "DB trong `.env` là local". Ngày 27/11 chủ dự án xác nhận DB của máy làm việc hôm đó là DB dev, dù `DB_HOST` không phải `localhost`. Cần chủ dự án ghi rõ mỗi máy dùng DB nào, rồi sửa câu này trong `CLAUDE.md`.
 5. Trong Project claude.ai: thêm thư mục `docs` vào nguồn GitHub, đổi nhánh đồng bộ sang `feature/ban-tin`, rồi xóa 2 bản cũ `claude/Dac-ta-chuc-nang-ban-tin.md` và `claude/Ban-giao-phien-lam-viec.md`.
+6. Muốn thử ca 404 của API mẫu (bước 2.4): cần một tài khoản thử thuộc SOLA, ghi mật khẩu vào `backend/test-accounts.local`.
 
 ## 8. Việc còn mở về kỹ thuật
 
