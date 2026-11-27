@@ -8,6 +8,7 @@ import timeRoute from "./routes/timesRoute.js";
 import authRoute from "./routes/authRoute.js";
 import userRoute from "./routes/userRoute.js";
 import lookupRoute from "./routes/lookupRoute.js";
+import bulletinTemplateRoute from "./routes/bulletinTemplateRoute.js";
 import { protectedRoute } from "./middleware/authMiddleware.js";
 
 dotenv.config();
@@ -66,6 +67,7 @@ app.use("/api/time", timeRoute);
 // Protected routes
 app.use("/api/users", protectedRoute, userRoute);
 app.use("/api/lookups", protectedRoute, lookupRoute);
+app.use("/api/bulletin-templates", protectedRoute, bulletinTemplateRoute);
 
 // Unknown API routes
 app.use("/api", (req, res) => {
